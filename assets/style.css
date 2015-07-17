@@ -1,0 +1,11 @@
+.spinner{float: left; margin:0;}
+.form-table .form-table td{
+    margin-bottom: 5px;
+    padding: 0 10px 5px 0;
+}
+.repeatable-fieldset .remove-row{
+  display: none;
+}
+.new-row .remove-row{
+  display: inline-block;
+}
