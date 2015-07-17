@@ -21,6 +21,8 @@ class Wizhi_Filter{
 		$this->post_types = $post_types;
 		$this->taxonomies = $taxonomies;
 		$this->hide_search = $hide_search;
+		
+		add_action( 'generate_rewrite_rules', array( $this, 'add_rewrite_rules' ) );
 
         // 显示多条件过滤元素
 		$this->wizhi_multi_filters();
@@ -51,6 +53,8 @@ class Wizhi_Filter{
 				$terms = get_terms($taxonomy, $args);
 				$is_all = get_query_var($query_var) ? '' : 'selected';
 				$count = count($terms);
+				
+				$origin_url = $_SERVER['REQUEST_URI'];
 
 				if ($count > 0) :
 
@@ -72,6 +76,46 @@ class Wizhi_Filter{
 
 		endforeach;
 
+	}
+	
+	
+	
+	// 添加重定向规则
+	public function add_rewrite_rules(){
+	
+	 	global $wp_rewrite;
+	 	// 获取需要筛选的文章类型和分类法
+	 	$post_types = $this->post_types;
+	 	$taxonomies = $this->taxonomies;
+	
+	 	// 排除默认分类法方法
+		if(is_array($taxonomies)){
+			array_push($taxonomies, 'category', 'post_tag');
+		}else{
+			$taxonomies = array(
+				'category',
+				'post_tag'
+			);
+		}
+		
+		// Polylang 支持
+		if(function_exists('pll_current_language')){
+			array_push($taxonomies, 'language');
+		}
+		
+		// 搜索字符串
+		$addtion_var = array('q');
+		
+	 	if($post_types){
+	 		// 初始化重定向类
+		 	$rewrite_rule_class = new Wizhi_Filters_Rewrite_Rules();
+		 	foreach($post_types as $post_type){
+		 		// 为每个文章类型运行此功能
+				$new_rules = $rewrite_rule_class->generate_rewrite_rules($post_type, $taxonomies, $addtion_var);
+				$wp_rewrite->rules = $new_rules + $wp_rewrite->rules;
+			}
+		}
+				
 	}
 
 
