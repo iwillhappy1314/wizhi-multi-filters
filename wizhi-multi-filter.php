@@ -104,6 +104,31 @@ function wizhi_filter_add_types(){
 }
 
 
+// 根据当前查询的文章类型，字段判断文章类型和分类法
+function wizhi_multi_filters(){
+	$current_query = get_queried_object();
+
+	if( !is_tax() ){
+		$post_type = array( $current_query->name );
+	} else {
+		$taxonomy_object = get_taxonomy( $current_query->taxonomy );
+    	$post_type = $taxonomy_object->object_type;
+	}
+
+	$args_tax = array(
+        'object_type' => $post_type,
+        'public'   => true,
+        '_builtin' => false
+    );
+    $taxonomies = get_taxonomies( $args_tax, 'names', 'and' );
+
+    $filters = new Wizhi_Filter($post_type, $taxonomies, true);
+	$wp_query = $filters->wizhi_get_filter_object();
+
+	return $wp_query;
+}
+
+
 /**
  * 显示默认的CSS
  */
