@@ -39,6 +39,8 @@ class Wizhi_Filter{
 
 		$taxonomies = $this->taxonomies;
 
+		echo '<div class="wizhi-selects">';
+
 		foreach ($taxonomies as $taxonomy) :
 
 			$tax = get_taxonomy($taxonomy); ?>
@@ -49,8 +51,7 @@ class Wizhi_Filter{
 
 				$query_var = $taxonomy;
 
-				$args = array('taxonomy' => $taxonomy);
-				$terms = get_terms($taxonomy, $args);
+				$terms = get_terms($taxonomy);
 				$is_all = get_query_var($query_var) ? '' : 'selected';
 				$count = count($terms);
 				
@@ -76,6 +77,8 @@ class Wizhi_Filter{
 
 		endforeach;
 
+		echo '</div>';
+
 	}
 	
 	
@@ -89,14 +92,14 @@ class Wizhi_Filter{
 	 	$taxonomies = $this->taxonomies;
 	
 	 	// 排除默认分类法方法
-		if(is_array($taxonomies)){
-			array_push($taxonomies, 'category', 'post_tag');
-		}else{
-			$taxonomies = array(
-				'category',
-				'post_tag'
-			);
-		}
+		// if(is_array($taxonomies)){
+		// 	array_push($taxonomies, 'category', 'post_tag');
+		// }else{
+		// 	$taxonomies = array(
+		// 		'category',
+		// 		'post_tag'
+		// 	);
+		// }
 		
 		// Polylang 支持
 		if(function_exists('pll_current_language')){
@@ -127,6 +130,8 @@ class Wizhi_Filter{
 
 		$taxonomies = $this->taxonomies;
 
+		echo '<div class="wizhi-btns">';
+
 		foreach ($taxonomies as $taxonomy) :
 
 			// 获取查询变量值
@@ -139,9 +144,9 @@ class Wizhi_Filter{
 
 				$term = get_term_by('slug', $query_value, $taxonomy); ?>
 
-				<div class="btn-group">
-					<a href="#" class="btn btn-default"><?php echo $term->name; ?></a>
-					<a href="<?php echo remove_query_arg($query_var); ?>" class="btn btn-close">X</a>
+				<div class="wizhi-btn-group">
+					<a href="#" class="wizhi-btn wizhi-btn-default"><?php echo $term->name; ?></a>
+					<a href="<?php echo remove_query_arg($query_var); ?>" class="wizhi-btn wizhi-btn-close">X</a>
 				</div>
 
 			<?php
@@ -149,6 +154,8 @@ class Wizhi_Filter{
 			endif;
 
 		endforeach;
+
+		echo '</div>';
 
 	}
 	
@@ -161,10 +168,10 @@ class Wizhi_Filter{
 		if( !$this->hide_search ){
 			?>
 			
-			<form class="pure-form" role="search" method="get" id="searchform" action="">
-				<input type="text" name="q" class="pure-input-1-2" placeholder="" value="<?php echo get_query_var('q', ''); ?>">
+			<form class="wizhi-form" role="search" method="get" id="searchform" action="">
+				<input type="text" name="q" class="wizhi-search" placeholder="" value="<?php echo get_query_var('q', ''); ?>">
 				<input type="hidden" name="paged" value="1">
-				<button type="submit" class="pure-button pure-button-primary">搜索</button>
+				<button type="submit" class="wizhi-btn wizhi-btn-primary">搜索</button>
 			</form>
 			
 		<?php
@@ -213,8 +220,6 @@ class Wizhi_Filter{
 		
 		// 添加搜索变量 
 		$q = get_query_var('q', '');
-
-        print_r($q);
 		
 		$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
 		$args = array(

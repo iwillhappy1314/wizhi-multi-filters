@@ -135,13 +135,15 @@ function wizhi_multi_filters(){
 if( !$hide_css ){ add_action( 'wp_head', 'admin_css' ); }
 function admin_css(){ ?>
 	<style>
-		.wizhi-select { padding: 0 0 8px 0;margin: 0 0 8px 0; border-bottom: 1px solid #eee; }
+		.wizhi-btns,.wizhi-form{margin: 10px 30px;}
+		.wizhi-select { padding: 0 0 8px 0;margin: 0 0 8px 0; border-bottom: 1px solid #ddd; }
 		.wizhi-select a{ padding: 2px 5px; }
         .wizhi-select strong{padding-right: 5px;}
 		.wizhi-select a.selected{ color: #337AB7; }
-		.btn-group{ margin-top: 10px; display: inline-block; }
-		.btn{ color: #333; background-color: #efefef; border: 1px solid #ccc; padding: 3px 8px; font-size: 14px; line-height: 1.42857143;}
-		.btn-close{ margin-left: -5px;}
+		.wizhi-btn-group{ margin-top: 10px; display: inline-block; }
+		.wizhi-btn{ color: #333; vertical-align: top; background-color: #efefef; border: 1px solid #ccc; padding: 3px 8px; font-size: 14px; line-height: 1.42857143;}
+		.wizhi-btn-close{ margin-left: -5px;}
+		.wizhi-search{padding: 3px !important; line-height: 1.3 !important; font-size: 14px; vertical-align: top !important;}
 	</style>
 <?php
 }

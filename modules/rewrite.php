@@ -49,6 +49,8 @@ class Wizhi_Filters_Rewrite_Rules {
 				  
 		    }
 	    }
+
+	    $query_vars[] = 'q';
 		
 	    // 遍历所有的查询参数组合
 	    for( $i = 1; $i <= count( $query_vars );  $i++ ) {

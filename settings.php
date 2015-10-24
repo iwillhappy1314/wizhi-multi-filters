@@ -44,8 +44,8 @@ function wizhi_multi_filter_management_page() {
     if (isset($_POST['save_filters'])) :
 
         // 获取选项数据
-        $to_filter_type = isset( $_POST["to_filter_type"] ) ? $_POST["to_filter_type"] : '';
-        $to_filter_tax = isset( $_POST["to_filter_tax"] ) ? $_POST["to_filter_tax"] : '';
+        // $to_filter_type = isset( $_POST["to_filter_type"] ) ? $_POST["to_filter_type"] : '';
+        // $to_filter_tax = isset( $_POST["to_filter_tax"] ) ? $_POST["to_filter_tax"] : '';
         $hide_css = isset( $_POST["hide_css"] ) ? $_POST["hide_css"] : '';
         $hide_search = isset( $_POST["hide_search"] ) ? $_POST["hide_search"] : '';
         $wizhi_show_current = isset( $_POST["wizhi_show_current"] ) ? $_POST["wizhi_show_current"] : '';
@@ -60,8 +60,8 @@ function wizhi_multi_filter_management_page() {
         update_option('wizhi_type_label', $wizhi_type_label);
         update_option('wizhi_tax', $wizhi_tax);
         update_option('wizhi_use_type_tax', $wizhi_use_type_tax);
-        update_option('to_filter_type', $to_filter_type);
-        update_option('to_filter_tax', $to_filter_tax);
+        // update_option('to_filter_type', $to_filter_type);
+        // update_option('to_filter_tax', $to_filter_tax);
         update_option('hide_css', $hide_css);
         update_option('hide_search', $hide_search);
         update_option('wizhi_show_current', $wizhi_show_current);
@@ -99,8 +99,8 @@ function wizhi_multi_filter_management_page() {
     );
 
     // 已选择的文章类型和分类法
-    $selected_type = get_option('to_filter_type');
-    $selected_tax = ( get_option('to_filter_tax') ) ? get_option('to_filter_tax') : array();
+    // $selected_type = get_option('to_filter_type');
+    // $selected_tax = ( get_option('to_filter_tax') ) ? get_option('to_filter_tax') : array();
     $wizhi_saved_tax = ( get_option('wizhi_tax') ) ? get_option('wizhi_tax') : $wizhi_default_tax;
 
     ?>
@@ -161,7 +161,7 @@ function wizhi_multi_filter_management_page() {
                 </td>
             </tr>
 
-            <tr>
+<!--             <tr>
                 <th scope="row"><label>选择需要筛选的文章类型</label></th>
                 <td>
                     <select name="to_filter_type" id="wizhi-type">
@@ -188,7 +188,7 @@ function wizhi_multi_filter_management_page() {
                         </label> <br/>
                     <?php endforeach; ?>
                 </td>
-            </tr>
+            </tr> -->
 
             <tr>
                 <th scope="row"><label>不显示CSS</label></th>
