@@ -1,0 +1,16 @@
+{
+  "name": "wizhi/wizhi_multi_filter",
+  "description": "Multi conditions post filter in wordpress",
+  "type": "wordpress-plugin",
+  "require": {
+    "thefold/wordpress-dispatcher": "^1.0"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Amos Lee",
+      "email": "iwillhappy1314@gmail.com"
+    }
+  ],
+  "minimum-stability": "dev"
+}

@@ -1,5 +1,9 @@
 <?php
 
+require_once( WIZHI_FILTER . 'vendor/autoload.php' );
+
+use \TheFold\WordPress\Dispatch;
+
 /**
  * Class Wizhi_Filter
  */
@@ -51,7 +55,10 @@ class Wizhi_Filter{
 
 				$query_var = $taxonomy;
 
+				print_r($tax);
+
 				$terms = get_terms($taxonomy);
+					
 				$is_all = get_query_var($query_var) ? '' : 'selected';
 				$count = count($terms);
 				
