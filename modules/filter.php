@@ -1,9 +1,5 @@
 <?php
 
-require_once( WIZHI_FILTER . 'vendor/autoload.php' );
-
-use \TheFold\WordPress\Dispatch;
-
 /**
  * Class Wizhi_Filter
  */
@@ -55,8 +51,6 @@ class Wizhi_Filter{
 
 				$query_var = $taxonomy;
 
-				print_r($tax);
-
 				$terms = get_terms($taxonomy);
 					
 				$is_all = get_query_var($query_var) ? '' : 'selected';
@@ -99,14 +93,10 @@ class Wizhi_Filter{
 	 	$taxonomies = $this->taxonomies;
 	
 	 	// 排除默认分类法方法
-		// if(is_array($taxonomies)){
-		// 	array_push($taxonomies, 'category', 'post_tag');
-		// }else{
-		// 	$taxonomies = array(
-		// 		'category',
-		// 		'post_tag'
-		// 	);
-		// }
+		$taxonomies = array(
+			'category',
+			'post_tag'
+		);
 		
 		// Polylang 支持
 		if(function_exists('pll_current_language')){

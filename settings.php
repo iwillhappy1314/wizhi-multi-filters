@@ -56,15 +56,15 @@
 
 
 			// 保存设置选项到数据库
-			update_option( 'wizhi_type_name', $wizhi_type_name );
-			update_option( 'wizhi_type_label', $wizhi_type_label );
-			update_option( 'wizhi_tax', $wizhi_tax );
-			update_option( 'wizhi_use_type_tax', $wizhi_use_type_tax );
+			update_option( 'wizhi_type_name', sanitize_text_field( $wizhi_type_name ) );
+			update_option( 'wizhi_type_label', sanitize_text_field( $wizhi_type_label )  );
+			update_option( 'wizhi_tax', sanitize_text_field( $wizhi_tax ) );
+			update_option( 'wizhi_use_type_tax', sanitize_text_field( $wizhi_use_type_tax ) );
 			// update_option('to_filter_type', $to_filter_type);
 			// update_option('to_filter_tax', $to_filter_tax);
-			update_option( 'hide_css', $hide_css );
-			update_option( 'hide_search', $hide_search );
-			update_option( 'wizhi_show_current', $wizhi_show_current );
+			update_option( 'hide_css', sanitize_text_field( $hide_css ) );
+			update_option( 'hide_search', sanitize_text_field( $hide_search ) );
+			update_option( 'wizhi_show_current', sanitize_text_field( $wizhi_show_current ) );
 
 			echo '<div class="updated"><p>恭喜！保存成功。</p></div>';
 
@@ -82,7 +82,7 @@
 		$post_types = get_post_types( $args_type, 'objects', 'and' );
 
 		// 根据已选中的文章类型获取分类法
-		$select_type = get_option( 'to_filter_type' );
+		// $select_type = get_option( 'to_filter_type' );
 
 		// 获取所有分类法
 		$args_tax   = array(
@@ -233,7 +233,7 @@
 			</table>
 
 			<p class="submit">
-				<input type="submit" name="save_filters" value="保存" class="button-primary"/>
+				<input type="submit" name="save_filters" value="<?php esc_attr_e('保存'); ?>" class="button-primary"/>
 			</p>
 
 		</form>
