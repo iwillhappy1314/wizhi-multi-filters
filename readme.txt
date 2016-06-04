@@ -4,7 +4,7 @@ Donate link:
 Tags: admin, post, pages, plugin, CMS, filter
 Requires at least: 3.4
 Tested up to: 4.4
-Stable tag: 1.5
+Stable tag: 1.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,20 +17,12 @@ Wizhi Multi Filters 为WordPress的文章类型添加按照自定义分类法进
 
 = 使用方法
 
-输出多条件筛选过滤列表
+1. 复制主题的 `archive.php` 为 `archive-prod.php`, "prod" 为上面设置中的 “文章类型名称” 的英文名称</li>
+2. 添加以下代码到 `archive-prod.php` 模板中的 `<?php while ( have_posts() ) : the_post(); ?>` 之前</li>
 
-`<?php
-    $filters = new Wizhi_Filter();
- 	$wp_query = $filters->wizhi_get_filter_object();
-?>`
+`<?php if ( function_exists( "wizhi_multi_filters" ) ) { wizhi_multi_filters(); } ?>`
 
-输入多条件筛选过滤列表，就是一个标准的WordPress查询
-
-`<?php if (have_posts()) { ?>
-    <?php while (have_posts()) : the_post(); ?>
-        <?php get_template_part( 'content', 'lists' ); ?>
-    <?php endwhile; ?>
-<?php } ?>`
+注意：插件需要需要 PHP 5.4 以上的版本才能运行，建议使用 PHP 5.6
 
 
 = BUG反馈和功能建议 =
@@ -48,11 +40,27 @@ BUG反馈和功能建议请发送邮件至：iwillhappy1314@gmail.com
 
 == Frequently Asked Questions ==
 
+= 插件可以筛选多个文章类型里面的文章吗 =
+
+可以, 每个文章类型需要单独建一个存档页面模板
+
+= 插件支持使用现有的自定义文章类型吗 =
+
+可以, 现有的自定义文章类型和插件内置的没有区别, 一样使用
+
+= 可以在首页显示筛选条件吗 =
+
+可以, 不过设置比较复杂, 请资讯作者
+
 
 == Screenshots ==
 
 
 == Changelog ==
+
+= 1.6 =
+* 修正设置页面错误
+* 增加 PHP 版本要求
 
 = 1.5 =
 * 添加多文章类型支持
