@@ -3,7 +3,7 @@
 Plugin Name:        Wizhi Multi Filters
 Plugin URI:         https://www.wpzhiku.com/wizhi-multi-filters/
 Description:        为WordPress的文章类型添加按照自定义分类法进行多条件筛选的功能。
-Version:            1.6
+Version:            1.7
 Author:             Amos Lee
 Author URI:         https://www.wpzhiku.com/
 License:            MIT License
@@ -11,6 +11,15 @@ License URI:        http://opensource.org/licenses/MIT
 */
 
 define( 'WIZHI_FILTER', plugin_dir_path( __FILE__ ) );
+
+// 添加更新通知
+add_action('in_plugin_update_message-wizhi-multi-filters/wizhi-multi-filter.php', 'wizhi_filter_show_update_notice', 10, 2);
+function wizhi_filter_show_update_notice($current_plugin_data, $new_plugin_data){
+   if (isset($new_plugin_data->upgrade_notice) && strlen(trim($new_plugin_data->upgrade_notice)) > 0){
+        echo '<p style="background-color: #d54e21; padding: 10px; color: #f9f9f9; margin-top: 10px"><strong><span class="dashicons dashicons-warning"></span>警告: </strong> ';
+        echo esc_html($new_plugin_data->upgrade_notice), '</p>';
+   }
+}
 
 //快速添加文章类型和分类法
 require_once( WIZHI_FILTER . 'modules/post_types.php' );

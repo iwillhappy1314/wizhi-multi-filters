@@ -4,7 +4,7 @@ Donate link:
 Tags: admin, post, pages, plugin, CMS, filter
 Requires at least: 3.4
 Tested up to: 4.4
-Stable tag: 1.6
+Stable tag: 1.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,13 +50,23 @@ BUG反馈和功能建议请发送邮件至：iwillhappy1314@gmail.com
 
 = 可以在首页显示筛选条件吗 =
 
-可以, 不过设置比较复杂, 请资讯作者
+可以, 不过设置比较复杂, 请咨询插件作者
 
 
 == Screenshots ==
 
 
+== Upgrade Notice ==
+
+= 1.7 =
+
+* 新版本需要 PHP 5.4 以上的版本才能正常运行，如果PHP版本低于5.4，请不要更新此版本，否则将使您的站点出现致命错误而不可访问。
+
+
 == Changelog ==
+
+= 1.7 =
+* 增加更新提示
 
 = 1.6 =
 * 修正设置页面错误
