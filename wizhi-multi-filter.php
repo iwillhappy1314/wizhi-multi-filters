@@ -3,7 +3,7 @@
 Plugin Name:        Wizhi Multi Filters
 Plugin URI:         https://www.wpzhiku.com/wizhi-multi-filters/
 Description:        为WordPress的文章类型添加按照自定义分类法进行多条件筛选的功能。
-Version:            1.7
+Version:            1.8
 Author:             Amos Lee
 Author URI:         https://www.wpzhiku.com/
 License:            MIT License

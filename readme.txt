@@ -4,7 +4,7 @@ Donate link:
 Tags: admin, post, pages, plugin, CMS, filter
 Requires at least: 3.4
 Tested up to: 4.4
-Stable tag: 1.7
+Stable tag: 1.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,12 +58,15 @@ BUG反馈和功能建议请发送邮件至：iwillhappy1314@gmail.com
 
 == Upgrade Notice ==
 
-= 1.7 =
+= 1.8 =
 
-* 新版本需要 PHP 5.4 以上的版本才能正常运行，如果PHP版本低于5.4，请不要更新此版本，否则将使您的站点出现致命错误而不可访问。
+* 新版本需要 PHP 5.6 以上的版本才能正常运行，如果PHP版本低于5.6，请不要更新此版本，否则将使您的站点出现致命错误而不可访问。
 
 
 == Changelog ==
+
+= 1.8 =
+* 增加 PHP 版本检测，防止低版本 PHP 导致致命错误。
 
 = 1.7 =
 * 增加更新提示
