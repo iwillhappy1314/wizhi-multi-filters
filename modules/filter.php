@@ -12,7 +12,7 @@ class Wizhi_Filter {
 	 * @var array
 	 */
 	private $post_types;
-	private $taxonomies = [ ];
+	private $taxonomies = [];
 	private $hide_search;
 
 	function __construct( $post_types, $taxonomies, $hide_search ) {
@@ -22,20 +22,12 @@ class Wizhi_Filter {
 		$this->taxonomies  = $taxonomies;
 		$this->hide_search = $hide_search;
 
-		add_action( 'generate_rewrite_rules', [ $this, 'add_rewrite_rules' ] );
-
-		// 显示多条件过滤元素
-		$this->wizhi_multi_filters();
-		$this->wizhi_filter_search();
-		$this->wizhi_current_filter();
 	}
 
 	/**
 	 * 获取分类法过滤链接
-	 *
-	 * @param array $taxonomies 需要显示的过滤条件的自定义分类法名称
 	 */
-	public function wizhi_multi_filters() {
+	public function show_filters() {
 
 		$taxonomies = $this->taxonomies;
 
@@ -45,8 +37,8 @@ class Wizhi_Filter {
 
 			$tax = get_taxonomy( $taxonomy ); ?>
 
-			<div class="wizhi-select">
-				<strong><?php echo $tax->label; ?></strong>
+            <div class="wizhi-select">
+                <strong><?php echo $tax->label; ?></strong>
 				<?php
 
 				$query_var = $taxonomy;
@@ -56,23 +48,34 @@ class Wizhi_Filter {
 				$is_all = get_query_var( $query_var ) ? '' : 'selected';
 				$count  = count( $terms );
 
-				$origin_url = $_SERVER[ 'REQUEST_URI' ];
+				echo '<ul>';
 
 				if ( $count > 0 ) :
 
 					echo '<a class="' . $is_all . '" href="' . remove_query_arg( $query_var ) . '">所有</a>';
 					foreach ( $terms as $term ) :
+						echo '<li>';
+
 						if ( get_query_var( $query_var ) == $term->slug ) {
 							echo '<a href="' . remove_query_arg( $query_var ) . '" class="selected">' . $term->name . "</a>";
 						} else {
-							echo '<a href="' . add_query_arg( [ $query_var => $term->slug, 'paged' => false ] ) . '">' . $term->name . "</a>";
+							echo '<a href="' . remove_query_arg( [
+									'st_by_pop',
+									'pop_dir',
+									'st_by_date',
+									'date_dir',
+								], add_query_arg( [ $query_var => $term->slug, 'paged' => false ] ) ) . '">' . $term->name . "</a>";
 						}
+
+						echo '</li>';
 					endforeach;
 
 				endif;
 
+				echo '</ul>';
+
 				?>
-			</div>
+            </div>
 
 			<?php
 
@@ -83,46 +86,11 @@ class Wizhi_Filter {
 	}
 
 
-	// 添加重定向规则
-	public function add_rewrite_rules() {
-
-		global $wp_rewrite;
-		// 获取需要筛选的文章类型和分类法
-		$post_types = $this->post_types;
-		$taxonomies = $this->taxonomies;
-
-		// 排除默认分类法方法
-		$taxonomies = [
-			'category',
-			'post_tag',
-		];
-
-		// Polylang 支持
-		if ( function_exists( 'pll_current_language' ) ) {
-			array_push( $taxonomies, 'language' );
-		}
-
-		// 搜索字符串
-		$addtion_var = [ 'q' ];
-
-		if ( $post_types ) {
-			// 初始化重定向类
-			$rewrite_rule_class = new Wizhi_Filters_Rewrite_Rules();
-			foreach ( $post_types as $post_type ) {
-				// 为每个文章类型运行此功能
-				$new_rules         = $rewrite_rule_class->generate_rewrite_rules( $post_type, $taxonomies, $addtion_var );
-				$wp_rewrite->rules = $new_rules + $wp_rewrite->rules;
-			}
-		}
-
-	}
-
-
 	/**
 	 * 显示当前选择的过滤项目
 	 *
 	 */
-	public function wizhi_current_filter() {
+	public function current_filter() {
 
 		$taxonomies             = $this->taxonomies;
 
@@ -140,10 +108,10 @@ class Wizhi_Filter {
 
 				$term = get_term_by( 'slug', $query_value, $taxonomy ); ?>
 
-				<div class="wizhi-btn-group">
-					<a href="#" class="wizhi-btn wizhi-btn-default"><?php echo $term->name; ?></a>
-					<a href="<?php echo remove_query_arg( $query_var ); ?>" class="wizhi-btn wizhi-btn-close">X</a>
-				</div>
+                <div class="wizhi-btn-group">
+                    <a href="#" class="wizhi-btn wizhi-btn-default"><?php echo $term->name; ?></a>
+                    <a href="<?php echo remove_query_arg( $query_var ); ?>" class="wizhi-btn wizhi-btn-close">X</a>
+                </div>
 
 				<?php
 
@@ -160,15 +128,18 @@ class Wizhi_Filter {
 	 * 显示按条件搜索的选项
 	 *
 	 */
-	public function wizhi_filter_search() {
+	public function search_form() {
 		if ( ! $this->hide_search ) {
+
+			$q = isset( $_POST[ 'q' ] ) ? $_POST[ 'q' ] : false;
+
 			?>
 
-			<form class="wizhi-form" role="search" method="get" id="searchform" action="">
-				<input type="text" name="q" class="wizhi-search" placeholder="" value="<?php echo get_query_var( 'q', '' ); ?>">
-				<input type="hidden" name="paged" value="1">
-				<button type="submit" class="wizhi-btn wizhi-btn-primary">搜索</button>
-			</form>
+            <form class="wizhi-form" role="search" method="post" id="searchform" action="<?php echo esc_url( get_current_url() ) ?>">
+                <input type="text" name="q" class="wizhi-search" placeholder="" value="<?php echo $q; ?>">
+                <input type="hidden" name="paged" value="1">
+                <button type="submit" class="wizhi-btn wizhi-btn-primary">搜索</button>
+            </form>
 
 			<?php
 
@@ -178,18 +149,75 @@ class Wizhi_Filter {
 
 
 	/**
-	 * 输入获取到的文章循环对象
+	 * 显示排序条件
+	 */
+	public function sort_links() {
+		$date_dir = isset( $_GET[ 'date_dir' ] ) ? $_GET[ 'date_dir' ] : false;
+		$pop_dir  = isset( $_GET[ 'pop_dir' ] ) ? $_GET[ 'pop_dir' ] : false;
+		?>
+
+        <div class="wizhi-sort">
+
+            <span class="sort-by-date">
+				<?php if ( $date_dir == 'ASC' ) : ?>
+                    <a href="<?php echo remove_query_arg( [ 'st_by_pop', 'pop_dir' ], add_query_arg( [ 'st_by_date' => 1, 'date_dir' => 'DESC' ] ) ); ?>"
+                       class="">按时间降序</a>
+				<?php else: ?>
+                    <a href="<?php echo remove_query_arg( [ 'st_by_pop', 'pop_dir' ], add_query_arg( [ 'st_by_date' => 1, 'date_dir' => 'ASC' ] ) ); ?>"
+                       class="">按时间升序</a>
+				<?php endif; ?>
+            </span>
+
+            <span class="sort-by-pop">
+				<?php if ( $pop_dir == 'ASC' ) : ?>
+                    <a href="<?php echo remove_query_arg( [ 'st_by_date', 'date_dir' ], add_query_arg( [ 'st_by_pop' => 1, 'pop_dir' => 'DESC' ] ) ); ?>"
+                       class="">按人气降序</a>
+				<?php else: ?>
+                    <a href="<?php echo remove_query_arg( [ 'st_by_date', 'date_dir' ], add_query_arg( [ 'st_by_pop' => 1, 'pop_dir' => 'ASC' ] ) ); ?>"
+                       class="">按人气升序</a>
+				<?php endif; ?>
+            </span>
+
+        </div>
+
+	<?php }
+
+
+	/**
+	 * 获取当前查询的文章数量
 	 *
-	 * @param array $taxonomies 需要显示的过滤条件的自定义分类法名称
+	 * @return int
+	 */
+	public function count() {
+		$query = $this->get_filtered_object();
+
+		return $query->post_count;
+	}
+
+
+	/**
+	 * 输入获取到的文章循环对象
 	 *
 	 * @return \WP_Query
 	 */
-	public function wizhi_get_filter_object() {
+	public function get_filtered_object() {
 
-		$post_types = $this->post_types;
+		$post_types = $this->post_types[ 0 ];
 		$taxonomies = $this->taxonomies;
 
-		// 初始化分类法查询数组
+		/**
+		 * 获取查询变量
+		 */
+		$q          = isset( $_POST[ 'q' ] ) ? $_POST[ 'q' ] : false;
+		$st_by_date = isset( $_GET[ 'st_by_date' ] ) ? $_GET[ 'st_by_date' ] : false;
+		$st_by_pop  = isset( $_GET[ 'st_by_pop' ] ) ? $_GET[ 'st_by_pop' ] : false;
+		$date_dir   = isset( $_GET[ 'date_dir' ] ) ? $_GET[ 'date_dir' ] : false;
+		$pop_dir    = isset( $_GET[ 'pop_dir' ] ) ? $_GET[ 'pop_dir' ] : false;
+
+
+		/**
+		 * 获取分类法查询数组
+		 */
 		$tax_query_array = [ 'relation' => 'AND' ];
 
 		foreach ( $taxonomies as $taxonomy ) :
@@ -214,17 +242,66 @@ class Wizhi_Filter {
 
 		endforeach;
 
-		// 添加搜索变量 
-		$q = get_query_var( 'q', '' );
+		$tax_query = [];
+		if ( count( $tax_query_array ) > 1 ) {
+			$tax_query = [
+				'tax_query' => $tax_query_array,
+			];
+		}
+
+
+		/**
+		 * 排序数据
+		 */
+		$order_args = [];
+
+		if ( $st_by_date && ! $st_by_pop ) {
+			$order_args = [
+				'orderby' => 'date',
+				'order'   => $date_dir,
+			];
+		}
+
+		if ( $st_by_pop && ! $st_by_date ) {
+			$order_args = [
+				'orderby'  => 'meta_value_num',
+				'meta_key' => 'views',
+				'order'    => $pop_dir,
+			];
+		}
+
+		if ( $st_by_pop && $st_by_date ) {
+			$order_args = [
+				'orderby'  => [ 'date' => $date_dir, 'meta_value_num' => $pop_dir ],
+				'meta_key' => 'views',
+			];
+		}
+
+
+		/**
+		 * 搜索数据
+		 */
+		$search_args = [];
+		if ( $q ) {
+			$search_args = [
+				's' => $q,
+			];
+		}
+
 
 		$paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
-		$args  = [
+
+
+		/**
+		 * 默认查询数组
+		 */
+		$default_args = [
 			'post_type'      => $post_types,
 			'posts_per_page' => get_option( 'posts_per_page' ),
 			'paged'          => $paged,
-			's'              => $q,
-			'tax_query'      => $tax_query_array,
 		];
+
+		$args = array_merge( $default_args, $tax_query, $order_args, $search_args );
 
 		$wp_query = new WP_Query( $args );
 
