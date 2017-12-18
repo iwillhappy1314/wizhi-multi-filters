@@ -1,26 +1,64 @@
 === Plugin Name ===
 Contributors: iwillhappy1314
-Donate link: 
+Donate link: https://www.wpzhiku.com
 Tags: admin, post, pages, plugin, CMS, filter
 Requires at least: 3.4
 Tested up to: 4.4
-Stable tag: 1.8.3
+Requires PHP: 5.6
+Stable tag: 1.8.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Wizhi Multi Filters 为WordPress的文章类型添加按照自定义分类法进行多条件筛选的功能。
+Wizhi Multi Filters 为 WordPress 的自定义文章类型添加按照自定义分类法进行多条件筛选的功能。
 
 == Description ==
 
-Wizhi Multi Filters 为WordPress的文章类型添加按照自定义分类法进行多条件筛选的功能。
+Wizhi Multi Filters 为 WordPress 的自定义文章类型添加按照自定义分类法进行多条件筛选的功能。
 
 
 = 使用方法
 
-1. 复制主题的 `archive.php` 为 `archive-prod.php`, "prod" 为上面设置中的 “文章类型名称” 的英文名称</li>
-2. 添加以下代码到 `archive-prod.php` 模板中的 `<?php while ( have_posts() ) : the_post(); ?>` 之前</li>
+1. 添加自定义文章类型和分类方法
 
-`<?php if ( function_exists( "wizhi_multi_filters" ) ) { wizhi_multi_filters(); } ?>`
+````
+if ( function_exists( 'wizhi_create_types' ) ) {
+    wizhi_create_types( "prod", "产品", [ 'title', 'editor', 'author', 'excerpt', 'thumbnail', 'custom-fields', 'comments' ], true );
+    wizhi_create_taxs( "prod_cat", 'prod', "类别", true );
+    wizhi_create_taxs( "prod_area", 'prod', "产地", true );
+    wizhi_create_taxs( "prod_size", 'prod', "尺寸", true );
+}
+````
+
+2. 复制主题的 `archive.php` 为 `archive-prod.php`, "prod" 为上面设置中的 “文章类型名称” 的英文名称，在 `have_posts()` 代码前添加代码：
+
+````
+<?php
+    if ( function_exists( "wizhi_multi_filters" ) ) {
+        $filters   = wizhi_multi_filters();
+        $new_query = $filters->get_filtered_object();
+    }
+?>
+````
+
+然后按需要使用下面的代码显示对应的筛选组件到合适的位置。
+
+*显示分类法筛选链接*
+
+````
+<?php $filters->show_filters(); ?>
+````
+
+*显示排序链接*
+
+````
+<?php $filters->sort_links(); ?>
+````
+
+*显示搜索表单*
+
+````
+<?php $filters->search_form(); ?>
+````
 
 注意：插件需要需要 PHP 5.4 以上的版本才能运行，建议使用 PHP 5.6
 
@@ -56,14 +94,10 @@ BUG反馈和功能建议请发送邮件至：iwillhappy1314@gmail.com
 == Screenshots ==
 
 
-== Upgrade Notice ==
-
-= 1.8 =
-
-* 新版本需要 PHP 5.6 以上的版本才能正常运行，如果PHP版本低于5.6，请不要更新此版本，否则将使您的站点出现致命错误而不可访问。
-
-
 == Changelog ==
+
+= 1.8.4 =
+* 增加按时间或浏览量排序功能、移除不再需要的后台设置和相关代码
 
 = 1.8 =
 * 增加 PHP 版本检测，防止低版本 PHP 导致致命错误。
