@@ -5,7 +5,7 @@ Tags: admin, post, pages, plugin, CMS, filter
 Requires at least: 3.4
 Tested up to: 4.4
 Requires PHP: 5.6
-Stable tag: 1.8.4
+Stable tag: 1.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,14 +33,20 @@ if ( function_exists( 'wizhi_create_types' ) ) {
 
 ````
 <?php
-    if ( function_exists( "wizhi_multi_filters" ) ) {
-        $filters   = wizhi_multi_filters();
-        $new_query = $filters->get_filtered_object();
+    if ( function_exists( "wizhi_filter" ) ) {
+        $filters   = wizhi_filter();
     }
 ?>
 ````
 
 然后按需要使用下面的代码显示对应的筛选组件到合适的位置。
+
+
+*获取当前筛选条件的 WP_Query 对象*
+
+````
+<?php $new_query = $filters->get_filtered_object(); ?>
+````
 
 *显示分类法筛选链接*
 
@@ -58,6 +64,12 @@ if ( function_exists( 'wizhi_create_types' ) ) {
 
 ````
 <?php $filters->search_form(); ?>
+````
+
+*显示当前查询到的文章数*
+
+````
+<?php $filters->total(); ?>
 ````
 
 注意：插件需要需要 PHP 5.4 以上的版本才能运行，建议使用 PHP 5.6
@@ -95,6 +107,11 @@ BUG反馈和功能建议请发送邮件至：iwillhappy1314@gmail.com
 
 
 == Changelog ==
+
+= 1.9 =
+
+* 增加新的过滤方法，更加灵活
+* 弃用旧的过滤方法，旧的过滤方法将在 2.x 版本中移除
 
 = 1.8.4 =
 * 增加按时间或浏览量排序功能、移除不再需要的后台设置和相关代码

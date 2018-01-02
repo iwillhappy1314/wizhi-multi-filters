@@ -186,10 +186,10 @@ class Filter {
 	 *
 	 * @return int
 	 */
-	public function count() {
+	public function total() {
 		$query = $this->get_filtered_object();
 
-		return $query->post_count;
+		return $query->found_posts;
 	}
 
 
