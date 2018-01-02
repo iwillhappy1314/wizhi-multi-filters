@@ -10,46 +10,88 @@ License:            MIT License
 License URI:        http://opensource.org/licenses/MIT
 */
 
-define( 'WIZHI_FILTER', plugin_dir_path( __FILE__ ) );
-
-
 if ( version_compare( phpversion(), '5.6.0', '<' ) ) {
 
-    // 显示警告信息
-    if ( is_admin() ) {
-        add_action( 'admin_notices', function () {
-            printf( '<div class="error"><p>' . __( '您当前的PHP版本（%1$s）不符合插件要求, 请升级到 PHP %2$s 或更新的版本， 否则插件没有任何作用。', 'wizhi' ) . '</p></div>', phpversion(), '5.6.0' );
-        } );
-    }
+	// 显示警告信息
+	if ( is_admin() ) {
+		add_action( 'admin_notices', function () {
+			printf( '<div class="error"><p>' . __( '您当前的PHP版本（%1$s）不符合插件要求, 请升级到 PHP %2$s 或更新的版本， 否则插件没有任何作用。', 'wizhi' ) . '</p></div>', phpversion(), '5.6.0' );
+		} );
+	}
 
-    return;
+	return;
 }
 
-//快速添加文章类型和分类法
-require_once( WIZHI_FILTER . 'modules/post_types.php' );
-require_once( WIZHI_FILTER . 'modules/filter.php' );
+require_once( plugin_dir_path( __FILE__ ) . 'vendor/autoload.php' );
 
-// 根据当前查询的文章类型，字段判断文章类型和分类法
-function wizhi_multi_filters() {
-    $current_query = get_queried_object();
 
-    if ( ! is_tax() ) {
-        $post_type = [ $current_query->name ];
-    } else {
-        $taxonomy_object = get_taxonomy( $current_query->taxonomy );
-        $post_type       = $taxonomy_object->object_type;
-    }
+/**
+ * 旧的过滤方法，已启用
+ *
+ * @param string $post_type
+ * @param array  $taxonomies
+ *
+ * @return \Wizhi\Filter\Legacy
+ */
+function wizhi_multi_filters( $post_type = '', $taxonomies = [] ) {
+	$current_query = get_queried_object();
 
-    $args_tax   = [
-        'object_type' => $post_type,
-        'public'      => true,
-        '_builtin'    => false,
-    ];
-    $taxonomies = get_taxonomies( $args_tax, 'names', 'and' );
+	if ( ! $post_type ) {
+		if ( ! is_tax() ) {
+			$post_type = [ $current_query->name ];
+		} else {
+			$taxonomy_object = get_taxonomy( $current_query->taxonomy );
+			$post_type       = $taxonomy_object->object_type;
+		}
+	}
 
-    $filters = new Wizhi_Filter( $post_type, $taxonomies, false );
+	if ( ! $taxonomies ) {
+		$args_tax   = [
+			'object_type' => $post_type,
+			'public'      => true,
+			'_builtin'    => false,
+		];
+		$taxonomies = get_taxonomies( $args_tax, 'names', 'and' );
+	}
 
-    return $filters;
+	$filters = new Wizhi\Filter\Legacy( $post_type, $taxonomies, false );
+
+	return $filters;
+}
+
+
+/**
+ * 新的过滤方法，可以按需显示需要的元素
+ *
+ * @param string $post_type
+ * @param array  $taxonomies
+ *
+ * @return \Wizhi\Filter\Filter
+ */
+function wizhi_filter( $post_type = '', $taxonomies = [] ) {
+
+	$current_query = get_queried_object();
+
+	if ( ! $post_type ) {
+		if ( ! is_tax() ) {
+			$post_type = [ $current_query->name ];
+		} else {
+			$taxonomy_object = get_taxonomy( $current_query->taxonomy );
+			$post_type       = $taxonomy_object->object_type;
+		}
+	}
+
+	if ( ! $taxonomies ) {
+		$args_tax   = [
+			'object_type' => $post_type,
+			'public'      => true,
+			'_builtin'    => false,
+		];
+		$taxonomies = get_taxonomies( $args_tax, 'names', 'and' );
+	}
+
+
+	return new Wizhi\Filter\Filter( $post_type, $taxonomies );
 }
 
 
@@ -106,5 +148,5 @@ add_action( 'wp_head', function () { ?>
             vertical-align: top !important;
         }
     </style>
-    <?php
+	<?php
 } );

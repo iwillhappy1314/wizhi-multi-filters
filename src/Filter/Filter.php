@@ -1,10 +1,11 @@
 <?php
 
+namespace Wizhi\Filter;
+
 /**
  * Class Wizhi_Filter
  */
-class Wizhi_Filter {
-
+class Filter {
 
 	/*
 	 * 要显示的过滤条件的自定义分类法名称
@@ -13,14 +14,12 @@ class Wizhi_Filter {
 	 */
 	private $post_types;
 	private $taxonomies = [];
-	private $hide_search;
 
-	function __construct( $post_types, $taxonomies, $hide_search ) {
+	function __construct( $post_types, $taxonomies ) {
 
 		// 获取参数
-		$this->post_types  = $post_types;
-		$this->taxonomies  = $taxonomies;
-		$this->hide_search = $hide_search;
+		$this->post_types = $post_types;
+		$this->taxonomies = $taxonomies;
 
 	}
 
@@ -77,7 +76,7 @@ class Wizhi_Filter {
 				?>
             </div>
 
-			<?php
+		<?php
 
 		endforeach;
 
@@ -113,7 +112,7 @@ class Wizhi_Filter {
                     <a href="<?php echo remove_query_arg( $query_var ); ?>" class="wizhi-btn wizhi-btn-close">X</a>
                 </div>
 
-				<?php
+			<?php
 
 			endif;
 
@@ -129,21 +128,20 @@ class Wizhi_Filter {
 	 *
 	 */
 	public function search_form() {
-		if ( ! $this->hide_search ) {
 
-			$q = isset( $_POST[ 'q' ] ) ? $_POST[ 'q' ] : false;
+		$q = isset( $_POST[ 'q' ] ) ? $_POST[ 'q' ] : false;
+		global $wp;
+		$current_url = home_url( add_query_arg( array(), $wp->request ) );
 
-			?>
+		?>
 
-            <form class="wizhi-form" role="search" method="post" id="searchform" action="<?php echo esc_url( get_current_url() ) ?>">
-                <input type="text" name="q" class="wizhi-search" placeholder="" value="<?php echo $q; ?>">
-                <input type="hidden" name="paged" value="1">
-                <button type="submit" class="wizhi-btn wizhi-btn-primary">搜索</button>
-            </form>
+        <form class="wizhi-form" role="search" method="post" id="searchform" action="<?php echo $current_url; ?>">
+            <input type="text" name="q" class="wizhi-search" placeholder="" value="<?php echo $q; ?>">
+            <input type="hidden" name="paged" value="1">
+            <button type="submit" class="wizhi-btn wizhi-btn-primary">搜索</button>
+        </form>
 
-			<?php
-
-		}
+		<?php
 
 	}
 
@@ -303,7 +301,7 @@ class Wizhi_Filter {
 
 		$args = array_merge( $default_args, $tax_query, $order_args, $search_args );
 
-		$wp_query = new WP_Query( $args );
+		$wp_query = new \WP_Query( $args );
 
 		return $wp_query;
 
