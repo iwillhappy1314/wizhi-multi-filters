@@ -51,7 +51,7 @@ class Filter {
 
 				if ( $count > 0 ) :
 
-					echo '<a class="' . $is_all . '" href="' . remove_query_arg( $query_var ) . '">所有</a>';
+					echo '<li><a class="' . $is_all . '" href="' . remove_query_arg( $query_var ) . '">所有</a><li>';
 					foreach ( $terms as $term ) :
 						echo '<li>';
 
