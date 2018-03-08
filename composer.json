@@ -10,7 +10,7 @@
       "Wizhi\\": "src/"
     },
     "files": [
-      "src/post_types.php"
+      "src/helper.php"
     ]
   },
   "license": "MIT",
