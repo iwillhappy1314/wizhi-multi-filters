@@ -7,8 +7,10 @@ namespace Composer\Autoload;
 class ComposerStaticInit59057821eb04469a56bff79213e671a8
 {
     public static $files = array (
+        'e54100d542398f1a2b8406721188abb2' => __DIR__ . '/..' . '/wenprise/content-types/src/content-type.php',
+        'e13df2aca5088cd061b400a5e11cf139' => __DIR__ . '/..' . '/wenprise/content-types/src/taxonomy.php',
+        '9968b45337becf13658c08a16ab4407d' => __DIR__ . '/..' . '/wenprise/content-types/src/helper.php',
         '3d0e88aad197c988a28b1c624cf13e32' => __DIR__ . '/../..' . '/src/post_types.php',
-        '00d09953df7bec6b90a30eac4b77d7fc' => __DIR__ . '/../..' . '/src/settings.php',
     );
 
     public static $prefixLengthsPsr4 = array (

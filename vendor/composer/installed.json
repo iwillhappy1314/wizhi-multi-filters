@@ -1,0 +1,43 @@
+[
+    {
+        "name": "wenprise/content-types",
+        "version": "1.0.2",
+        "version_normalized": "1.0.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/iwillhappy1314/wenprise-content-types.git",
+            "reference": "8ec3ea37552d3633913549ff1507e373810324bd"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/iwillhappy1314/wenprise-content-types/zipball/8ec3ea37552d3633913549ff1507e373810324bd",
+            "reference": "8ec3ea37552d3633913549ff1507e373810324bd",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.6"
+        },
+        "time": "2018-01-31T04:38:27+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": [],
+            "files": [
+                "src/content-type.php",
+                "src/taxonomy.php",
+                "src/helper.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Amos Lee",
+                "email": "iwillhappy1314@gmail.com"
+            }
+        ],
+        "description": "Create WordPress content types and taxonomies more easier."
+    }
+]

@@ -1,0 +1,113 @@
+# Copyright (C) 2016 Automattic
+# This file is distributed under the GNU General Public License v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: _s 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/tags/_s\n"
+"POT-Creation-Date: 2018-01-31 12:37+0800\n"
+"PO-Revision-Date: 2018-01-31 12:37+0800\n"
+"Last-Translator: Amos Lee <iwillhappy1314@gmail.com>\n"
+"Language-Team: \n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.11\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Poedit-KeywordsList: __;_\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: content-type.php:25 content-type.php:26 taxonomy.php:30
+#, php-format
+msgid "Add New %s"
+msgstr "添加%s"
+
+# @ _s
+#: content-type.php:27 taxonomy.php:27
+#, php-format
+msgid "Edit %s"
+msgstr "编辑%s"
+
+#: content-type.php:28 taxonomy.php:31
+#, php-format
+msgid "New %s"
+msgstr "添加%s"
+
+#: content-type.php:29 taxonomy.php:26
+#, php-format
+msgid "All %s"
+msgstr "所有%s"
+
+#: content-type.php:30 taxonomy.php:28
+#, php-format
+msgid "View %s"
+msgstr "查看%s"
+
+#: content-type.php:31 taxonomy.php:34
+#, php-format
+msgid "Search %s"
+msgstr "搜索%s"
+
+#: content-type.php:32
+#, php-format
+msgid "Could not find %s"
+msgstr "找不到%s"
+
+#: content-type.php:33
+#, php-format
+msgid "Could not find %s in trash"
+msgstr "回收站中没有%s"
+
+#: taxonomy.php:29
+#, php-format
+msgid "Upgrade %s"
+msgstr "更新 %s"
+
+#: taxonomy.php:32 taxonomy.php:33
+#, php-format
+msgid "Parent %s"
+msgstr "父级%s"
+
+#: taxonomy.php:35
+#, php-format
+msgid "Popular %s"
+msgstr "热门%s"
+
+#: taxonomy.php:36
+#, php-format
+msgid "Separate %s with commas"
+msgstr "使用 %s 分隔"
+
+#: taxonomy.php:37
+#, php-format
+msgid "Add or remove %s"
+msgstr "添加或删除%s"
+
+#: taxonomy.php:38
+#, php-format
+msgid "Choose from the most used %s"
+msgstr "从最常用的 %s 选择"
+
+#: taxonomy.php:39
+#, php-format
+msgid "No %s found."
+msgstr "没有找到%s"
+
+#~ msgid "Loop Template Name"
+#~ msgstr "循环模板名称"
+
+#~ msgid "%s"
+#~ msgstr "%s"
+
+#~ msgid "%1$s"
+#~ msgstr "%1$s"
+
+#~ msgid "Archives"
+#~ msgstr "归档"
+
+#~ msgid "Home"
+#~ msgstr "首页 "
+
+#~ msgid "Add a menu"
+#~ msgstr "添加菜单"

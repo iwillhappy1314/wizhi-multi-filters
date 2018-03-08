@@ -1,0 +1,222 @@
+# Copyright (C) 2016 Automattic
+# This file is distributed under the GNU General Public License v2 or later.
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: _s 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/tags/_s\n"
+"POT-Creation-Date: 2018-01-30 14:27+0800\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2015-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"X-Generator: Poedit 1.8.11\n"
+"X-Poedit-Basepath: ../../../../../../../Amoslee/Sites/techclub/wp-content/themes/techclub/vendor/wenprise\n"
+"X-Poedit-SearchPath-0: .\n"
+
+# @ _s
+#: 404.php:17
+msgid "Oops! That page can&rsquo;t be found."
+msgstr ""
+
+# @ _s
+#: 404.php:21
+msgid "It looks like nothing was found at this location. Maybe try one of the links below or a search?"
+msgstr ""
+
+# @ _s
+#: 404.php:33
+msgid "Most Used Categories"
+msgstr ""
+
+# @ _s
+#. translators: %1$s: smiley
+#: 404.php:51
+#, php-format
+msgid "Try looking in the monthly archives. %1$s"
+msgstr ""
+
+# @ _s
+#: comments.php:31
+#, php-format
+msgctxt "comments title"
+msgid "One thought on &ldquo;%2$s&rdquo;"
+msgid_plural "%1$s thoughts on &ldquo;%2$s&rdquo;"
+msgstr[0] ""
+msgstr[1] ""
+
+# @ _s
+#: comments.php:40 comments.php:61
+msgid "Comment navigation"
+msgstr ""
+
+# @ _s
+#: comments.php:43 comments.php:64
+msgid "Older Comments"
+msgstr ""
+
+# @ _s
+#: comments.php:44 comments.php:65
+msgid "Newer Comments"
+msgstr ""
+
+# @ _s
+#: comments.php:78
+msgid "Comments are closed."
+msgstr ""
+
+# @ _s
+#: footer.php:18
+msgid "https://wordpress.org/"
+msgstr ""
+
+# @ _s
+#: footer.php:18
+#, php-format
+msgid "Proudly powered by %s"
+msgstr ""
+
+# @ _s
+#: footer.php:20
+#, php-format
+msgid "Theme: %1$s by %2$s."
+msgstr ""
+
+# @ _s
+#: functions.php:47
+msgid "Primary"
+msgstr ""
+
+# @ _s
+#: functions.php:102
+msgid "Sidebar"
+msgstr ""
+
+# @ _s
+#: header.php:25
+msgid "Skip to content"
+msgstr ""
+
+# @ _s
+#: header.php:45
+msgid "Primary Menu"
+msgstr ""
+
+# @ _s
+#: inc/template-tags.php:28
+#, php-format
+msgctxt "post date"
+msgid "Posted on %s"
+msgstr ""
+
+# @ _s
+#: inc/template-tags.php:33
+#, php-format
+msgctxt "post author"
+msgid "by %s"
+msgstr ""
+
+# @ _s
+#. translators: used between list items, there is a space after the comma
+#: inc/template-tags.php:50 inc/template-tags.php:56
+msgid ", "
+msgstr ""
+
+# @ _s
+#: inc/template-tags.php:52
+#, php-format
+msgid "Posted in %1$s"
+msgstr ""
+
+# @ _s
+#: inc/template-tags.php:58
+#, php-format
+msgid "Tagged %1$s"
+msgstr ""
+
+# @ _s
+#: inc/template-tags.php:64
+msgid "Leave a comment"
+msgstr ""
+
+# @ _s
+#: inc/template-tags.php:64
+msgid "1 Comment"
+msgstr ""
+
+# @ _s
+#: inc/template-tags.php:64
+msgid "% Comments"
+msgstr ""
+
+# @ _s
+#. translators: %s: Name of current post
+#: inc/template-tags.php:71 template-parts/content-page.php:33
+#, php-format
+msgid "Edit %s"
+msgstr ""
+
+# @ _s
+#: search.php:19
+#, php-format
+msgid "Search Results for: %s"
+msgstr ""
+
+# @ _s
+#: template-parts/content-none.php:14
+msgid "Nothing Found"
+msgstr ""
+
+# @ _s
+#: template-parts/content-none.php:21
+#, php-format
+msgid "Ready to publish your first post? <a href=\"%1$s\">Get started here</a>."
+msgstr ""
+
+# @ _s
+#: template-parts/content-none.php:25
+msgid "Sorry, but nothing matched your search terms. Please try again with some different keywords."
+msgstr ""
+
+# @ _s
+#: template-parts/content-none.php:31
+msgid "It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching can help."
+msgstr ""
+
+# @ _s
+#: template-parts/content-page.php:22 template-parts/content.php:38
+msgid "Pages:"
+msgstr ""
+
+# @ _s
+#. translators: %s: Name of current post.
+#: template-parts/content.php:33
+#, php-format
+msgid "Continue reading %s <span class=\"meta-nav\">&rarr;</span>"
+msgstr ""
+
+#. Theme Name of the plugin/theme
+msgid "_s"
+msgstr ""
+
+# @ _s
+#. Theme URI of the plugin/theme
+msgid "http://underscores.me/"
+msgstr ""
+
+# @ _s
+#. Description of the plugin/theme
+msgid "Hi. I'm a starter theme called <code>_s</code>, or <em>underscores</em>, if you like. I'm a theme meant for hacking so don't use me as a <em>Parent Theme</em>. Instead try turning me into the next, most awesome, WordPress theme out there. That's what I'm here for."
+msgstr ""
+
+# @ _s
+#. Author of the plugin/theme
+msgid "Automattic"
+msgstr ""
+
+# @ _s
+#. Author URI of the plugin/theme
+msgid "http://automattic.com/"
+msgstr ""

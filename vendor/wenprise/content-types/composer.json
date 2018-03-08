@@ -1,16 +1,16 @@
 {
-  "name": "wizhi/multi-filters",
-  "description": "Convert Chinese post, taxonomy tag, uploaded filename to pinyin in WordPress.",
+  "name": "wenprise/content-types",
+  "description": "Create WordPress content types and taxonomies more easier.",
   "require": {
-    "php": ">=5.6",
-    "wenprise/content-types": "^1.0"
+    "php": ">=5.6"
   },
   "autoload": {
     "psr-4": {
-      "Wizhi\\": "src/"
     },
     "files": [
-      "src/post_types.php"
+      "src/content-type.php",
+      "src/taxonomy.php",
+      "src/helper.php"
     ]
   },
   "license": "MIT",
