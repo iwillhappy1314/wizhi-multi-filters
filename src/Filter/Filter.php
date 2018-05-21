@@ -24,7 +24,6 @@ class Filter
 		$this->taxonomies = $taxonomies;
 	}
 
-
 	/**
 	 * 移除分页参数
 	 *
@@ -42,7 +41,6 @@ class Filter
 		return $paged_string;
 	}
 
-
 	/**
 	 * 获取分类法过滤链接
 	 */
@@ -55,56 +53,129 @@ class Filter
 
 		foreach ( $taxonomies as $taxonomy ) :
 
-			$tax = get_taxonomy( $taxonomy ); ?>
+			$terms = get_terms( $taxonomy, [
+				'hide_empty' => false,
+			] );
 
-            <div class="wizhi-select">
-                <strong><?= $tax->label; ?></strong>
-				<?php
+			$term_counts = $this->get_filtered_term_post_counts( wp_list_pluck( $terms, 'term_id' ), $taxonomy );
 
-				$query_var = $taxonomy;
+			if ( array_sum( $term_counts ) > 0 ):
 
-				$terms = get_terms( $taxonomy );
+				$tax = get_taxonomy( $taxonomy ); ?>
 
-				$is_all = get_query_var( $query_var ) ? '' : 'selected';
-				$count  = count( $terms );
+                <div class="wizhi-select">
+                    <strong><?= $tax->label; ?></strong>
+					<?php
 
-				echo '<ul>';
+					$query_var = $taxonomy;
 
-				if ( $count > 0 ) :
+					$is_all = get_query_var( $query_var ) ? '' : 'selected';
+					$count  = count( $terms );
 
-					$exclude_all_var     = [ $query_var, 'page', 'paged' ];
-					$exclude_current_var = [ $query_var, 'page', 'paged' ];
-					$exclude_term_var    = [ 'st_by_pop', 'pop_dir', 'st_by_date', 'date_dir', 'page', 'paged', ];
+					echo '<ul>';
 
-					echo '<li><a class="' . $is_all . '" href="' . $this->remove_paged_var( remove_query_arg( $exclude_all_var ) ) . '">所有</a><li>';
-					foreach ( $terms as $term ) :
+					if ( $count > 0 ) :
 
-						$include_term_var = [ $query_var => $term->slug, 'paged' => false, ];
+						$exclude_all_var     = [ $query_var, 'page', 'paged' ];
+						$exclude_current_var = [ $query_var, 'page', 'paged' ];
+						$exclude_term_var    = [ 'st_by_pop', 'pop_dir', 'st_by_date', 'date_dir', 'page', 'paged', ];
 
-						echo '<li>';
+						echo '<li><a class="' . $is_all . '" href="' . $this->remove_paged_var( remove_query_arg( $exclude_all_var ) ) . '">所有</a></li>';
 
-						if ( get_query_var( $query_var ) == $term->slug ) {
-							echo '<a href="' . $this->remove_paged_var( remove_query_arg( $exclude_current_var ) ) . '" class="selected">' . $term->name . "</a>";
-						} else {
-							echo '<a href="' . $this->remove_paged_var( remove_query_arg( $exclude_term_var, add_query_arg( $include_term_var ) ) ) . '">' . $term->name . "</a>";
-						}
+						foreach ( $terms as $term ) :
 
-						echo '</li>';
-					endforeach;
+							$include_term_var = [ $query_var => $term->slug, 'paged' => false, ];
 
-				endif;
+							if ( $term_counts[ $term->term_id ] > 0 ) {
 
-				echo '</ul>';
+								echo '<li>';
 
-				?>
-            </div>
+								if ( get_query_var( $query_var ) == $term->slug ) {
+									echo '<a href="' . $this->remove_paged_var( remove_query_arg( $exclude_current_var ) ) . '" class="selected">' . $term->name . "</a>";
+								} else {
+									echo '<a href="' . $this->remove_paged_var( remove_query_arg( $exclude_term_var, add_query_arg( $include_term_var ) ) ) . '">' . $term->name . "</a>";
+								}
 
-		<?php
+								echo '</li>';
 
+							}
+
+						endforeach;
+
+					endif;
+
+					echo '</ul>';
+
+					?>
+                </div>
+
+			<?php
+
+			endif;
 		endforeach;
 
 		echo '</div>';
 	}
+
+
+	/**
+	 * 获取已筛选分类中的文章数量
+	 *
+	 * @param $term_ids
+	 * @param $taxonomy
+	 *
+	 * @return array
+	 */
+	public function get_filtered_term_post_counts( $term_ids, $taxonomy )
+	{
+		global $wpdb;
+		global $wp_query;
+
+		$post_type = $this->post_types;
+
+		$tax_query  = $wp_query->tax_query->queries;
+		$meta_query = $wp_query->meta_query->queries;
+
+		$tax_query  = new \WP_Tax_Query( $tax_query );
+		$meta_query = new \WP_Meta_Query( $meta_query );
+
+		$tax_query_sql  = $tax_query->get_sql( $wpdb->posts, 'ID' );
+		$meta_query_sql = $meta_query->get_sql( 'post', $wpdb->posts, 'ID' );
+
+		// Generate query.
+		$query             = [];
+		$query[ 'select' ] = "SELECT COUNT( DISTINCT {$wpdb->posts}.ID ) as term_count, terms.term_id as term_count_id";
+		$query[ 'from' ]   = "FROM {$wpdb->posts}";
+		$query[ 'join' ]   = "
+			INNER JOIN {$wpdb->term_relationships} AS term_relationships ON {$wpdb->posts}.ID = term_relationships.object_id
+			INNER JOIN {$wpdb->term_taxonomy} AS term_taxonomy USING( term_taxonomy_id )
+			INNER JOIN {$wpdb->terms} AS terms USING( term_id )
+			" . $tax_query_sql[ 'join' ] . $meta_query_sql[ 'join' ];
+
+		$query[ 'where' ] = "
+			WHERE {$wpdb->posts}.post_type IN ( 'school' )
+			AND {$wpdb->posts}.post_status = 'publish'"
+		                    . $tax_query_sql[ 'where' ] . $meta_query_sql[ 'where' ] .
+		                    'AND terms.term_id IN (' . implode( ',', array_map( 'absint', $term_ids ) ) . ')';
+
+		// if ( $search = WC_Query::get_main_search_query_sql() ) {
+		// 	$query[ 'where' ] .= ' AND ' . $search;
+		// }
+
+		$query[ 'group_by' ] = 'GROUP BY terms.term_id';
+		$query               = apply_filters( 'woocommerce_get_filtered_term_product_counts_query', $query );
+		$query               = implode( ' ', $query );
+
+		// We have a query - let's see if cached results of this query already exist.
+		$query_hash = md5( $query );
+
+		$results                      = $wpdb->get_results( $query, ARRAY_A ); // @codingStandardsIgnoreLine
+		$counts                       = array_map( 'absint', wp_list_pluck( $results, 'term_count', 'term_count_id' ) );
+		$cached_counts[ $query_hash ] = $counts;
+
+		return array_map( 'absint', (array) $cached_counts[ $query_hash ] );
+	}
+
 
 	/**
 	 * 显示当前选择的过滤项目
