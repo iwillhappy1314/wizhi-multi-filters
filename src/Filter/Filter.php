@@ -179,7 +179,7 @@ class Filter
 
 						$exclude_all_var     = [ $query_var, 'page', 'paged' ];
 						$exclude_current_var = [ $query_var, 'page', 'paged' ];
-						$exclude_other_var   = [ 'st_by_pop', 'pop_dir', 'st_by_date', 'date_dir', 'page', 'paged', ];
+						$exclude_other_var   = [ 'sort_by', 'dir', 'page', 'paged', ];
 
 						echo '<li><a class="' . $is_all . '" href="' . $this->remove_paged_var( remove_query_arg( $exclude_all_var ) ) . '">所有</a></li>';
 
@@ -245,7 +245,7 @@ class Filter
 
 				$value             = $value[ 0 ];
 				$include_meta_var  = [ $query_var => $value, 'paged' => false, ];
-				$exclude_other_var = [ 'st_by_pop', 'pop_dir', 'st_by_date', 'date_dir', 'page', 'paged', ];
+				$exclude_other_var = [ 'sort_by', 'dir', 'page', 'paged', ];
 
 				echo '<li>';
 
@@ -332,8 +332,8 @@ class Filter
 	public function current_filter()
 	{
 
-		$taxonomies             = $this->taxonomies;
-		$metas                  = $this->metas;
+		$taxonomies      = $this->taxonomies;
+		$metas           = $this->metas;
 
 		echo '<div class="wizhi-btns">';
 
@@ -344,7 +344,7 @@ class Filter
 
 			// 获取查询变量值
 			$query_var = $taxonomy;
-			$query_value        = get_query_var( $query_var );
+			$query_value = get_query_var( $query_var );
 
 			// 如果获取的查询变量值非空
 			if ( ! empty( $query_value ) ) :
@@ -397,8 +397,9 @@ class Filter
 	public function search_form()
 	{
 
-		$q = isset( $_POST[ 'q' ] ) ? $_POST[ 'q' ] : false;
 		global $wp;
+
+		$q           = isset( $_POST[ 'q' ] ) ? $_POST[ 'q' ] : false;
 		$current_url = home_url( add_query_arg( [], $wp->request ) );
 
 		?>
@@ -413,52 +414,46 @@ class Filter
 
 	}
 
+
 	/**
 	 * 显示排序条件
 	 */
-	public function sort_links()
+	public function show_sort_links()
 	{
-		$date_dir = isset( $_GET[ 'date_dir' ] ) ? $_GET[ 'date_dir' ] : false;
-		$pop_dir  = isset( $_GET[ 'pop_dir' ] ) ? $_GET[ 'pop_dir' ] : false;
+		$dir   = isset( $_GET[ 'dir' ] ) ? $_GET[ 'dir' ] : 'DESC';
+		$dir   = ( $dir == 'DESC' ) ? 'ASC' : 'DESC';
+		$sorts = $this->sorts;
 		?>
 
         <div class="wizhi-sort">
 
-            <span class="sort-by-date">
-				<?php if ( $date_dir == 'ASC' ) : ?>
-                    <a href="<?php echo remove_query_arg( [ 'st_by_pop', 'pop_dir' ], add_query_arg( [
-						'st_by_date' => 1,
-						'date_dir'   => 'DESC',
-					] ) ); ?>"
-                       class="">按时间降序</a>
-				<?php else: ?>
-                    <a href="<?php echo remove_query_arg( [ 'st_by_pop', 'pop_dir' ], add_query_arg( [
-						'st_by_date' => 1,
-						'date_dir'   => 'ASC',
-					] ) ); ?>"
-                       class="">按时间升序</a>
-				<?php endif; ?>
-            </span>
+			<?php foreach ( $sorts as $sort ): ?>
 
-            <span class="sort-by-pop">
-				<?php if ( $pop_dir == 'ASC' ) : ?>
-                    <a href="<?php echo remove_query_arg( [ 'st_by_date', 'date_dir' ], add_query_arg( [
-						'st_by_pop' => 1,
-						'pop_dir'   => 'DESC',
-					] ) ); ?>"
-                       class="">按人气降序</a>
+				<?php
+				$sort_query_var   = $sort[ 'order' ];
+				$sort_query_value = isset( $_GET[ $sort_query_var ] ) ? $_GET[ $sort_query_var ] : false;
+				?>
+
+				<?php if ( $sort_query_value ) : ?>
+                    <span class="wizhi-sort sort-by-<?= $sort_query_var; ?>">
+                        <a href="<?= add_query_arg( [ 'sort_by' => $sort_query_var, 'dir' => $dir, ] ); ?>">
+                            <?= $sort[ 'label' ]; ?>
+                        </a>
+                    </span>
 				<?php else: ?>
-                    <a href="<?php echo remove_query_arg( [ 'st_by_date', 'date_dir' ], add_query_arg( [
-						'st_by_pop' => 1,
-						'pop_dir'   => 'ASC',
-					] ) ); ?>"
-                       class="">按人气升序</a>
+                    <span class="wizhi-sort sort-by-<?= $sort_query_var; ?>">
+                        <a href="<?= add_query_arg( [ 'sort_by' => $sort_query_var, 'dir' => $dir, ] ); ?>">
+                            <?= $sort[ 'label' ]; ?>
+                        </a>
+                    </span>
 				<?php endif; ?>
-            </span>
+
+			<?php endforeach; ?>
 
         </div>
 
 	<?php }
+
 
 	/**
 	 * 获取当前查询的文章数量
@@ -487,11 +482,7 @@ class Filter
 		/**
 		 * 获取查询变量
 		 */
-		$q          = isset( $_POST[ 'q' ] ) ? $_POST[ 'q' ] : false;
-		$st_by_date = isset( $_GET[ 'st_by_date' ] ) ? $_GET[ 'st_by_date' ] : false;
-		$st_by_pop  = isset( $_GET[ 'st_by_pop' ] ) ? $_GET[ 'st_by_pop' ] : false;
-		$date_dir   = isset( $_GET[ 'date_dir' ] ) ? $_GET[ 'date_dir' ] : 'DESC';
-		$pop_dir    = isset( $_GET[ 'pop_dir' ] ) ? $_GET[ 'pop_dir' ] : false;
+		$q = isset( $_POST[ 'q' ] ) ? $_POST[ 'q' ] : false;
 
 		/**
 		 * 获取分类法查询数组
@@ -565,29 +556,15 @@ class Filter
 		/**
 		 * 排序数据
 		 */
-		$order_args = [];
+		$dir     = isset( $_GET[ 'dir' ] ) ? $_GET[ 'dir' ] : 'DESC';
+		$sort_by = isset( $_GET[ 'sort_by' ] ) ? $_GET[ 'sort_by' ] : false;
 
-		if ( $st_by_date && ! $st_by_pop ) {
-			$order_args = [
-				'orderby' => 'date',
-				'order'   => $date_dir,
-			];
-		}
+		$order_args = [
+			'orderby'  => 'meta_value_num',
+			'meta_key' => $sort_by,
+			'order'    => $dir,
+		];
 
-		if ( $st_by_pop && ! $st_by_date ) {
-			$order_args = [
-				'orderby'  => 'meta_value_num',
-				'meta_key' => 'views',
-				'order'    => $pop_dir,
-			];
-		}
-
-		if ( $st_by_pop && $st_by_date ) {
-			$order_args = [
-				'orderby'  => [ 'date' => $date_dir, 'meta_value_num' => $pop_dir ],
-				'meta_key' => 'views',
-			];
-		}
 
 		/**
 		 * 搜索数据
@@ -616,4 +593,5 @@ class Filter
 
 		return $wp_query;
 	}
+
 }
