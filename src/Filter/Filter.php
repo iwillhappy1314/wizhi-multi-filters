@@ -14,7 +14,23 @@ class Filter
 	 */
 	private $post_types;
 
+
+	/**
+	 * @var array
+	 */
 	private $taxonomies = [];
+
+	/**
+	 * @var array
+	 */
+	private $metas = [];
+
+
+	/**
+	 * @var array
+	 */
+	private $sorts = [];
+
 
 	function __construct( $post_types, $taxonomies )
 	{
@@ -41,6 +57,93 @@ class Filter
 		return $paged_string;
 	}
 
+
+	/**
+	 * 设置分类方法
+	 *
+	 * @param $tax
+	 *
+	 * @return $this
+	 */
+	function set_tax( $tax )
+	{
+		$this->taxonomies[] = $tax;
+
+		return $this;
+	}
+
+
+	/**
+	 * 添加自定义字段
+	 *
+	 * @param       $meta_key
+	 * @param       $meta_label
+	 * @param array $meta_values
+	 *
+	 * @return $this
+	 */
+	function add_meta( $meta_key, $meta_label, $meta_values = [] )
+	{
+		if ( count( $meta_values ) == 0 ) {
+			$meta_values = $this->get_all_meta_values( $meta_key );
+		}
+
+		$this->metas[] = [
+			'meta_key'   => $meta_key,
+			'meta_label' => $meta_label,
+			'meta_vales' => $meta_values,
+		];
+
+		return $this;
+
+	}
+
+
+	/**
+	 * 添加排序数组
+	 *
+	 * @param        $order
+	 * @param string $default
+	 *
+	 * @return $this
+	 */
+	function add_sorts( $order, $label, $default = 'DESC' )
+	{
+		$this->sorts[] = [
+			'order'   => $order,
+			'label'   => $label,
+			'default' => $default,
+		];
+
+		return $this;
+	}
+
+
+	/**
+	 * 获取自定义字段的所有可选值
+	 *
+	 * @param $meta_key
+	 *
+	 * @return array
+	 */
+	function get_all_meta_values( $meta_key )
+	{
+		global $wpdb;
+
+		$sql = $wpdb->prepare(
+			"
+                 SELECT DISTINCT meta_value
+                 FROM  $wpdb->postmeta 
+                 WHERE meta_key = %s ORDER BY 1
+		     ",
+			$meta_key );
+
+		$fields = $wpdb->get_results( $sql, ARRAY_N );
+
+		return $fields;
+	}
+
+
 	/**
 	 * 获取分类法过滤链接
 	 */
@@ -48,8 +151,6 @@ class Filter
 	{
 
 		$taxonomies = $this->taxonomies;
-
-		echo '<div class="wizhi-selects">';
 
 		foreach ( $taxonomies as $taxonomy ) :
 
@@ -78,7 +179,7 @@ class Filter
 
 						$exclude_all_var     = [ $query_var, 'page', 'paged' ];
 						$exclude_current_var = [ $query_var, 'page', 'paged' ];
-						$exclude_term_var    = [ 'st_by_pop', 'pop_dir', 'st_by_date', 'date_dir', 'page', 'paged', ];
+						$exclude_other_var   = [ 'st_by_pop', 'pop_dir', 'st_by_date', 'date_dir', 'page', 'paged', ];
 
 						echo '<li><a class="' . $is_all . '" href="' . $this->remove_paged_var( remove_query_arg( $exclude_all_var ) ) . '">所有</a></li>';
 
@@ -93,7 +194,7 @@ class Filter
 								if ( get_query_var( $query_var ) == $term->slug ) {
 									echo '<a href="' . $this->remove_paged_var( remove_query_arg( $exclude_current_var ) ) . '" class="selected">' . $term->name . "</a>";
 								} else {
-									echo '<a href="' . $this->remove_paged_var( remove_query_arg( $exclude_term_var, add_query_arg( $include_term_var ) ) ) . '">' . $term->name . "</a>";
+									echo '<a href="' . $this->remove_paged_var( remove_query_arg( $exclude_other_var, add_query_arg( $include_term_var ) ) ) . '">' . $term->name . "</a>";
 								}
 
 								echo '</li>';
@@ -114,7 +215,54 @@ class Filter
 			endif;
 		endforeach;
 
-		echo '</div>';
+	}
+
+
+	/**
+	 * 显示自定义字段过滤链接
+	 */
+	function show_meta_filter_links()
+	{
+
+		$metas = $this->metas;
+
+		foreach ( $metas as $meta ) {
+
+			echo '<div class="wizhi-select">';
+			echo '<strong>' . $meta[ 'meta_label' ] . '</strong>';
+
+			$query_var   = $meta[ 'meta_key' ];
+			$query_value = isset( $_GET[ $query_var ] ) ? $_GET[ $query_var ] : false;
+
+			$is_all = $query_value ? '' : 'selected';
+
+			$exclude_all_var     = [ $query_var, 'page', 'paged' ];
+			$exclude_current_var = [ $query_var, 'page', 'paged' ];
+
+			echo '<ul>';
+			echo '<li><a class="' . $is_all . '" href="' . $this->remove_paged_var( remove_query_arg( $exclude_all_var ) ) . '">所有</a></li>';
+			foreach ( $meta[ 'meta_vales' ] as $value ) {
+
+				$value             = $value[ 0 ];
+				$include_meta_var  = [ $query_var => $value, 'paged' => false, ];
+				$exclude_other_var = [ 'st_by_pop', 'pop_dir', 'st_by_date', 'date_dir', 'page', 'paged', ];
+
+				echo '<li>';
+
+				if ( $query_value == $value ) {
+					echo '<a href="' . $this->remove_paged_var( remove_query_arg( $exclude_current_var ) ) . '" class="selected">' . $value . "</a>";
+				} else {
+					echo '<a href="' . $this->remove_paged_var( remove_query_arg( $exclude_other_var, add_query_arg( $include_meta_var ) ) ) . '">' . $value . "</a>";
+				}
+
+				echo '</li>';
+			}
+			echo '</ul>';
+
+			echo '</div>';
+
+		}
+
 	}
 
 
@@ -185,18 +333,21 @@ class Filter
 	{
 
 		$taxonomies             = $this->taxonomies;
+		$metas                  = $this->metas;
 
 		echo '<div class="wizhi-btns">';
 
+		/**
+		 * 当前所选分类方法
+		 */
 		foreach ( $taxonomies as $taxonomy ) :
 
 			// 获取查询变量值
 			$query_var = $taxonomy;
 			$query_value        = get_query_var( $query_var );
-			$wizhi_show_current = get_option( 'wizhi_show_current' );
 
 			// 如果获取的查询变量值非空
-			if ( ! empty( $query_value ) && ! $wizhi_show_current ) :
+			if ( ! empty( $query_value ) ) :
 
 				$term = get_term_by( 'slug', $query_value, $taxonomy ); ?>
 
@@ -211,8 +362,33 @@ class Filter
 
 		endforeach;
 
+
+		/**
+		 * 当前所选自定义字段
+		 */
+		foreach ( $metas as $meta ) :
+
+			// 获取查询变量值
+			$query_var = $meta[ 'meta_key' ];;
+			$query_value = isset( $_GET[ $query_var ] ) ? $_GET[ $query_var ] : false;
+
+			// 如果获取的查询变量值非空
+			if ( ! empty( $query_value ) ) : ?>
+
+                <div class="wizhi-btn-group">
+                    <a href="#" class="wizhi-btn wizhi-btn-default"><?= $query_value; ?></a>
+                    <a href="<?php echo remove_query_arg( $query_var ); ?>" class="wizhi-btn wizhi-btn-close">X</a>
+                </div>
+
+			<?php
+
+			endif;
+
+		endforeach;
+
 		echo '</div>';
 	}
+
 
 	/**
 	 * 显示按条件搜索的选项
@@ -306,6 +482,7 @@ class Filter
 
 		$post_types = $this->post_types[ 0 ];
 		$taxonomies = $this->taxonomies;
+		$metas      = $this->metas;
 
 		/**
 		 * 获取查询变量
@@ -349,6 +526,41 @@ class Filter
 				'tax_query' => $tax_query_array,
 			];
 		}
+
+
+		/**
+		 * 获取自定义字段查询变量
+		 */
+		$meta_query_array = [ 'relation' => 'AND', ];
+
+		foreach ( $metas as $meta ) :
+
+			// 获取查询变量值
+			$query_var = $meta[ 'meta_key' ];;
+			$query_value = isset( $_GET[ $query_var ] ) ? $_GET[ $query_var ] : false;
+
+			// 如果获取的查询变量值非空
+			if ( $query_value ) :
+
+				$meta_query = [
+					'key'   => $query_var,
+					'value' => $query_value,
+				];
+
+				// 添加新的分类法查询到查询数组
+				array_push( $meta_query_array, $meta_query );
+
+			endif;
+
+		endforeach;
+
+		$meta_query = [];
+		if ( count( $meta_query_array ) > 1 ) {
+			$meta_query = [
+				'meta_query' => $meta_query_array,
+			];
+		}
+
 
 		/**
 		 * 排序数据
@@ -398,7 +610,7 @@ class Filter
 			'paged'          => $paged,
 		];
 
-		$args = array_merge( $default_args, $tax_query, $order_args, $search_args );
+		$args = array_merge( $default_args, $tax_query, $meta_query, $order_args, $search_args );
 
 		$wp_query = new \WP_Query( $args );
 

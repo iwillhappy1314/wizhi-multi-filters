@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 旧的过滤方法，已启用
+ * 旧的过滤方法，已弃用
  *
  * @param string $post_type
  * @param array  $taxonomies
@@ -82,10 +82,16 @@ add_action( 'wp_head', function () { ?>
 		}
 
 		.wizhi-select {
-			padding: 0 0 8px 0;
-			margin: 0 0 8px 0;
-			border-bottom: 1px solid #ddd;
+			padding: 0;
+			margin: 0;
+            display: flex;
 		}
+
+        .wizhi-select + .wizhi-select{
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #ddd;
+        }
 
 		.wizhi-select a {
 			padding: 2px 5px;
@@ -93,6 +99,7 @@ add_action( 'wp_head', function () { ?>
 
 		.wizhi-select strong {
 			padding-right: 5px;
+            min-width: 80px;
 		}
 
 		.wizhi-select a.selected {
