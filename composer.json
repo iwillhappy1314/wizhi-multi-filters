@@ -3,7 +3,8 @@
   "description": "Convert Chinese post, taxonomy tag, uploaded filename to pinyin in WordPress.",
   "require": {
     "php": ">=5.6",
-    "wenprise/content-types": "^1.0"
+    "wenprise/content-types": "^1.0",
+    "simettric/wp-query-builder": "dev-master"
   },
   "autoload": {
     "psr-4": {
@@ -20,5 +21,6 @@
       "email": "iwillhappy1314@gmail.com"
     }
   ],
-  "minimum-stability": "stable"
+  "minimum-stability": "dev",
+  "preferred-install": "dist"
 }

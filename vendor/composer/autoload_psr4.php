@@ -7,4 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Wizhi\\' => array($baseDir . '/src'),
+    'Simettric\\WPQueryBuilder\\' => array($vendorDir . '/simettric/wp-query-builder/src'),
 );

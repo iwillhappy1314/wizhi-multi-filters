@@ -2,6 +2,10 @@
 
 namespace Wizhi\Filter;
 
+use Simettric\WPQueryBuilder\Builder;
+use Simettric\WPQueryBuilder\MetaQuery;
+use Simettric\WPQueryBuilder\TaxonomyQuery;
+
 /**
  * Class Wizhi_Filter
  */
@@ -29,7 +33,19 @@ class Filter
 	/**
 	 * @var array
 	 */
-	private $sorts = [];
+	private $orders = [];
+
+
+	/**
+	 * @var int
+	 */
+	private $posts_per_page;
+
+
+	/**
+	 * @var array
+	 */
+	const BUILD_IN_ORDERBY = [ 'none', 'ID', 'author', 'title', 'name', 'type', 'date', 'modified', 'parent', 'rand', 'comment_count', 'relevance' ];
 
 
 	function __construct( $post_types, $taxonomies )
@@ -74,15 +90,37 @@ class Filter
 
 
 	/**
-	 * 添加自定义字段
+	 * 设置分页
 	 *
-	 * @param       $meta_key
-	 * @param       $meta_label
-	 * @param array $meta_values
+	 * @param $posts_per_page
 	 *
 	 * @return $this
 	 */
-	function add_meta( $meta_key, $meta_label, $meta_values = [] )
+	function set_per_page( $posts_per_page = 0 )
+	{
+		if ( $posts_per_page === 0 ) {
+			$posts_per_page = get_option( 'posts_per_page' );
+		}
+
+		$this->posts_per_page = $posts_per_page;
+
+		return $this;
+	}
+
+
+	/**
+	 * 添加自定义字段
+	 *
+	 * @param        $meta_key
+	 * @param        $meta_label
+	 * @param array  $meta_values
+	 * @param string $compare ( '=', '!=', '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN', 'EXISTS' and 'NOT EXISTS')
+	 * @param string $type    ('NUMERIC', 'BINARY', 'CHAR', 'DATE', 'DATETIME', 'DECIMAL', 'SIGNED', 'TIME', 'UNSIGNED', 也可以为 'DECIMAL' 和 'NUMERIC'
+	 *                        类型指定精确比例 (如, 'DECIMAL(10,5)' 或 'NUMERIC(10)')
+	 *
+	 * @return $this
+	 */
+	function add_meta( $meta_key, $meta_label, $meta_values = [], $compare = '=', $type = 'String' )
 	{
 		if ( count( $meta_values ) == 0 ) {
 			$meta_values = $this->get_all_meta_values( $meta_key );
@@ -92,6 +130,8 @@ class Filter
 			'meta_key'   => $meta_key,
 			'meta_label' => $meta_label,
 			'meta_vales' => $meta_values,
+			'compare'    => $meta_values,
+			'type'       => $type,
 		];
 
 		return $this;
@@ -107,9 +147,9 @@ class Filter
 	 *
 	 * @return $this
 	 */
-	function add_sorts( $order, $label, $default = 'DESC' )
+	function add_orders( $order, $label, $default = 'DESC' )
 	{
-		$this->sorts[] = [
+		$this->orders[] = [
 			'order'   => $order,
 			'label'   => $label,
 			'default' => $default,
@@ -179,7 +219,7 @@ class Filter
 
 						$exclude_all_var     = [ $query_var, 'page', 'paged' ];
 						$exclude_current_var = [ $query_var, 'page', 'paged' ];
-						$exclude_other_var   = [ 'sort_by', 'dir', 'page', 'paged', ];
+						$exclude_other_var   = [ 'order_by', 'dir', 'page', 'paged', ];
 
 						echo '<li><a class="' . $is_all . '" href="' . $this->remove_paged_var( remove_query_arg( $exclude_all_var ) ) . '">所有</a></li>';
 
@@ -245,7 +285,7 @@ class Filter
 
 				$value             = $value[ 0 ];
 				$include_meta_var  = [ $query_var => $value, 'paged' => false, ];
-				$exclude_other_var = [ 'sort_by', 'dir', 'page', 'paged', ];
+				$exclude_other_var = [ 'order_by', 'dir', 'page', 'paged', ];
 
 				echo '<li>';
 
@@ -422,7 +462,7 @@ class Filter
 	{
 		$dir   = isset( $_GET[ 'dir' ] ) ? $_GET[ 'dir' ] : 'DESC';
 		$dir   = ( $dir == 'DESC' ) ? 'ASC' : 'DESC';
-		$sorts = $this->sorts;
+		$sorts = $this->orders;
 		?>
 
         <div class="wizhi-sort">
@@ -436,13 +476,13 @@ class Filter
 
 				<?php if ( $sort_query_value ) : ?>
                     <span class="wizhi-sort sort-by-<?= $sort_query_var; ?>">
-                        <a href="<?= add_query_arg( [ 'sort_by' => $sort_query_var, 'dir' => $dir, ] ); ?>">
+                        <a href="<?= add_query_arg( [ 'order_by' => $sort_query_var, 'dir' => $dir, ] ); ?>">
                             <?= $sort[ 'label' ]; ?>
                         </a>
                     </span>
 				<?php else: ?>
                     <span class="wizhi-sort sort-by-<?= $sort_query_var; ?>">
-                        <a href="<?= add_query_arg( [ 'sort_by' => $sort_query_var, 'dir' => $dir, ] ); ?>">
+                        <a href="<?= add_query_arg( [ 'order_by' => $sort_query_var, 'dir' => $dir, ] ); ?>">
                             <?= $sort[ 'label' ]; ?>
                         </a>
                     </span>
@@ -467,6 +507,7 @@ class Filter
 		return $query->found_posts;
 	}
 
+
 	/**
 	 * 输入获取到的文章循环对象
 	 *
@@ -482,7 +523,12 @@ class Filter
 		/**
 		 * 获取查询变量
 		 */
-		$q = isset( $_POST[ 'q' ] ) ? $_POST[ 'q' ] : false;
+		$q              = isset( $_POST[ 'q' ] ) ? $_POST[ 'q' ] : false;
+		$dir            = isset( $_GET[ 'dir' ] ) ? $_GET[ 'dir' ] : 'DESC';
+		$order_by       = isset( $_GET[ 'order_by' ] ) ? $_GET[ 'order_by' ] : false;
+		$paged          = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
+		$posts_per_page = $this->posts_per_page;
+
 
 		/**
 		 * 获取分类法查询数组
@@ -527,15 +573,19 @@ class Filter
 		foreach ( $metas as $meta ) :
 
 			// 获取查询变量值
-			$query_var = $meta[ 'meta_key' ];;
+			$query_var   = $meta[ 'meta_key' ];
 			$query_value = isset( $_GET[ $query_var ] ) ? $_GET[ $query_var ] : false;
+			$type        = $meta[ 'type' ];
+			$compare     = $meta[ 'compare' ];
 
 			// 如果获取的查询变量值非空
 			if ( $query_value ) :
 
 				$meta_query = [
-					'key'   => $query_var,
-					'value' => $query_value,
+					'key'     => $query_var,
+					'value'   => $query_value,
+					'type'    => $type,
+					'compare' => $compare,
 				];
 
 				// 添加新的分类法查询到查询数组
@@ -554,20 +604,25 @@ class Filter
 
 
 		/**
-		 * 排序数据
+		 * 排序参数
 		 */
-		$dir     = isset( $_GET[ 'dir' ] ) ? $_GET[ 'dir' ] : 'DESC';
-		$sort_by = isset( $_GET[ 'sort_by' ] ) ? $_GET[ 'sort_by' ] : false;
 
-		$order_args = [
-			'orderby'  => 'meta_value_num',
-			'meta_key' => $sort_by,
-			'order'    => $dir,
-		];
+		if ( in_array( $order_by, static::BUILD_IN_ORDERBY ) ) {
+			$order_args = [
+				'orderby' => $order_by,
+				'order'   => $dir,
+			];
+		} else {
+			$order_args = [
+				'orderby'  => 'meta_value_num',
+				'meta_key' => $order_by,
+				'order'    => $dir,
+			];
+		}
 
 
 		/**
-		 * 搜索数据
+		 * 搜索参数
 		 */
 		$search_args = [];
 		if ( $q ) {
@@ -576,14 +631,12 @@ class Filter
 			];
 		}
 
-		$paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
-
 		/**
 		 * 默认查询数组
 		 */
 		$default_args = [
 			'post_type'      => $post_types,
-			'posts_per_page' => get_option( 'posts_per_page' ),
+			'posts_per_page' => $posts_per_page,
 			'paged'          => $paged,
 		];
 
@@ -592,6 +645,108 @@ class Filter
 		$wp_query = new \WP_Query( $args );
 
 		return $wp_query;
+
+	}
+
+
+	/**
+	 * 新查询
+	 *
+	 * @throws \Simettric\WPQueryBuilder\Exception\MainMetaQueryAlreadyCreatedException
+	 *
+	 * @return \WP_Query
+	 */
+	function get_query()
+	{
+
+		$builder = new Builder();
+
+		$post_types = $this->post_types[ 0 ];
+		$taxonomies = $this->taxonomies;
+		$metas      = $this->metas;
+
+
+		/**
+		 * 获取查询变量
+		 */
+		$q              = isset( $_POST[ 'q' ] ) ? $_POST[ 'q' ] : false;
+		$dir            = isset( $_GET[ 'dir' ] ) ? $_GET[ 'dir' ] : 'DESC';
+		$order_by       = isset( $_GET[ 'order_by' ] ) ? $_GET[ 'order_by' ] : false;
+		$paged          = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
+		$posts_per_page = $this->posts_per_page;
+
+
+		// 文章类型
+		$wp_query = $builder->addPostType( $post_types );
+
+		// 搜索
+		$wp_query = $wp_query->search( $q );
+
+
+		// 分类方法
+
+		try {
+			$wp_query = $wp_query->createMainTaxonomyQuery( "AND" );
+		} catch ( \Exception $e ) {
+			echo $e->getMessage();
+		}
+
+		foreach ( $taxonomies as $taxonomy ) :
+
+			// 获取查询变量值
+			$query_var   = $taxonomy;
+			$query_value = get_query_var( $query_var );
+
+			// 如果获取的查询变量值非空
+			if ( ! empty( $query_value ) ) :
+				$wp_query->addTaxonomyQuery( TaxonomyQuery::create( $taxonomy, 'slug', $query_value, true, "=" ) );
+			endif;
+
+		endforeach;
+
+
+		// 自定义字段
+		$wp_query = $builder->createMainMetaQuery( "AND" );
+
+		foreach ( $metas as $meta ) :
+
+			// 获取查询变量值
+			$query_var   = $meta[ 'meta_key' ];
+			$query_value = isset( $_GET[ $query_var ] ) ? $_GET[ $query_var ] : false;
+			$type        = $meta[ 'type' ];
+			$compare     = $meta[ 'compare' ];
+
+			// 如果获取的查询变量值非空
+			if ( $query_value ) :
+				$wp_query->addMetaQuery( MetaQuery::create( $query_var, $query_value, $compare, $type ) );
+			endif;
+
+		endforeach;
+
+
+		// 排序
+		if ( in_array( $order_by, static::BUILD_IN_ORDERBY ) ) {
+			$wp_query->setOrderBy( $order_by )
+			         ->setOrderDirection( $dir );
+		} else {
+			// 按自定义字段排序
+			try {
+				$wp_query->setOrderByMeta( $order_by, $dir, true );
+			} catch ( \Exception $e ) {
+				echo $e->getMessage();
+			}
+		}
+
+		// 设置分页
+		$wp_query->setLimit( $posts_per_page )
+		         ->setOffset( $posts_per_page * $paged );
+
+
+		// 获取 WP_Query 查询
+		$wp_query = $wp_query->getWPQuery();
+
+		return $wp_query;
+
 	}
 
 }
