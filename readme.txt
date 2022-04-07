@@ -4,8 +4,8 @@ Donate link: https://www.wpzhiku.com
 Tags: admin, post, pages, plugin, CMS, filter
 Requires at least: 3.4
 Tested up to: 4.4
-Requires PHP: 5.6
-Stable tag: 1.9
+Requires PHP: 7.3
+Stable tag: 2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,8 +33,8 @@ if ( function_exists( 'wizhi_create_types' ) ) {
 
 ````
 <?php
-    if ( function_exists( "wizhi_filter" ) ) {
-        $filters   = wizhi_filter();
+    if ( function_exists( "wizhi_multi_filter" ) ) {
+        $filters   = wizhi_multi_filter();
     }
 ?>
 ````
@@ -45,7 +45,7 @@ if ( function_exists( 'wizhi_create_types' ) ) {
 *获取当前筛选条件的 WP_Query 对象*
 
 ````
-<?php $new_query = $filters->get_filtered_object(); ?>
+<?php $new_query = $filters->get_queried_object(); ?>
 ````
 
 *显示分类法筛选链接*
@@ -107,6 +107,9 @@ BUG反馈和功能建议请发送邮件至：iwillhappy1314@gmail.com
 
 
 == Changelog ==
+
+= 2.0 =
+* 插件重构
 
 = 1.9 =
 
