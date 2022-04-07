@@ -13,13 +13,13 @@ function wizhi_multi_filter_menu()
 // 挂载插件js
 function wizhi_multi_filter_admin_scripts()
 {
-    wp_enqueue_script('wizhi-multi-filter-script', plugins_url('assets/script.js', __FILE__), ['jquery', 'jquery-sortable'], '', true);
+    wp_enqueue_script('wizhi-multi-filter-script', WIZHI_MULTI_FILTERS_URL . 'assets/script.js', ['jquery', 'jquery-ui-sortable'], '', true);
 }
 
 // 挂载插件样式
 function wizhi_multi_filter_admin_styles()
 {
-    wp_enqueue_style('wizhi-multi-filter-style', plugins_url('assets/style.css', __FILE__));
+    wp_enqueue_style('wizhi-multi-filter-style', WIZHI_MULTI_FILTERS_URL . 'assets/style.css');
 }
 
 /**
@@ -27,59 +27,6 @@ function wizhi_multi_filter_admin_styles()
  */
 function wizhi_multi_filter_options_page()
 {
-
-    ?>
-
-    <script>
-      jQuery(document).ready(function($) {
-
-        $('#add-row').on('click', function() {
-          var row = $('#repeatable-fieldset-one tr.repeatable-fieldset:last').clone(true);
-          row.removeClass('empty-row screen-reader-text');
-          row.insertAfter('#repeatable-fieldset-one tbody>tr:last').addClass('new-row');
-          return false;
-        });
-
-        $('.remove-row').on('click', function() {
-          $(this).parents('tr.new-row').remove();
-          return false;
-        });
-
-        $('#repeatable-fieldset-one tbody').sortable({
-          opacity: 0.6,
-          revert : true,
-          cursor : 'move',
-          handle : '.sort',
-        });
-
-        // 根据文章类型获取分类法
-        $('#wizhi-type').on('change', function() {
-
-          $('#wizhi-tax').html('<span class="spinner is-active"></span>');
-
-          $.ajax({
-            type    : 'get',
-            url     : ajaxurl,
-            data    : {
-              'action': 'wizhi_filter',
-              'type'  : $(this).val(),
-            },
-            dataType: 'json',
-            success : function(data) {
-              $('#wizhi-tax').empty();
-              $.each(data, function(i, item) {
-                $('#wizhi-tax').append('<div><label><input type="checkbox" name="to_filter_tax[]" value="' + item.name + '">' + item.label) + '</label> </div>';
-              });
-            },
-          });
-
-        });
-
-      });
-    </script>
-
-    <?php
-
     echo '<div class="wrap">';
     echo '<h2>选择需要过滤的自定义分类法和文章类型</h2>';
 

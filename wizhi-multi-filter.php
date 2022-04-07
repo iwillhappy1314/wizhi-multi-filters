@@ -10,6 +10,10 @@ License:            MIT License
 License URI:        http://opensource.org/licenses/MIT
 */
 
+define('WIZHI_MULTI_FILTERS_VERSION', '1.0.0');
+define('WIZHI_MULTI_FILTERS_PATH', plugin_dir_path(__FILE__));
+define('WIZHI_MULTI_FILTERS_URL', plugin_dir_url(__FILE__));
+
 if (version_compare(phpversion(), '5.6.0', '<')) {
 
     // 显示警告信息
