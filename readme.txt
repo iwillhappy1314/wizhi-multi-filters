@@ -51,25 +51,25 @@ if ( function_exists( 'wizhi_create_types' ) ) {
 *显示分类法筛选链接*
 
 ````
-<?php $filters->show_filters(); ?>
+<?php $filters->render_filters(); ?>
 ````
 
 *显示排序链接*
 
 ````
-<?php $filters->sort_links(); ?>
+<?php $filters->render_sort_links(); ?>
 ````
 
 *显示搜索表单*
 
 ````
-<?php $filters->search_form(); ?>
+<?php $filters->render_search_form(); ?>
 ````
 
 *显示当前查询到的文章数*
 
 ````
-<?php $filters->total(); ?>
+<?php echo $filters->get_total(); ?>
 ````
 
 注意：插件需要需要 PHP 5.4 以上的版本才能运行，建议使用 PHP 5.6

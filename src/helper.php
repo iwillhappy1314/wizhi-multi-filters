@@ -1,43 +1,27 @@
 <?php
 
 /**
- * 旧的过滤方法，已弃用
+ * 直接现实过滤HTML，以兼容旧版插件
  *
  * @param string $post_type
  * @param array  $taxonomies
- *
- * @return \Wizhi\Filter\Legacy
  */
-function wizhi_multi_filters($post_type = '', $taxonomies = [])
+function wizhi_multi_filters(string $post_type = '', array $taxonomies = [])
 {
-    $current_query = get_queried_object();
+    $filters = wizhi_filter(wizhi_get_post_type_name(), array_keys(wizhi_get_taxonomies()));
 
-    /**
-     * 获取文章类型
-     */
-    if ( ! $post_type) {
-        if ( ! is_tax()) {
-            $post_type = [$current_query->name];
-        } else {
-            $taxonomy_object = get_taxonomy($current_query->taxonomy);
-            $post_type       = $taxonomy_object->object_type;
-        }
-    }
+    $filters->add_orders('date', '时间');
+    $filters->add_orders('name', '名称');
 
-    /**
-     * 获取分类方法
-     */
-    if ( ! $taxonomies) {
-        $args_tax = [
-            'object_type' => $post_type,
-            'public'      => true,
-            '_builtin'    => false,
-        ];
+    $filters->render_filters();
 
-        $taxonomies = get_taxonomies($args_tax, 'names', 'and');
-    }
+    $filters->render_meta_filters();
 
-    return new Wizhi\Filter\Legacy($post_type, $taxonomies, false);
+    $filters->render_search_form();
+
+    $filters->render_sort_links();
+
+    echo $filters->get_total();
 }
 
 
@@ -49,7 +33,7 @@ function wizhi_multi_filters($post_type = '', $taxonomies = [])
  *
  * @return \Wizhi\Filter\Filter
  */
-function wizhi_filter($post_type = '', $taxonomies = [])
+function wizhi_filter(string $post_type = '', array $taxonomies = []): \Wizhi\Filter\Filter
 {
 
     $current_query = get_queried_object();

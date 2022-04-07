@@ -2,10 +2,6 @@
 
 namespace Wizhi\Filter;
 
-use Simettric\WPQueryBuilder\Builder;
-use Simettric\WPQueryBuilder\MetaQuery;
-use Simettric\WPQueryBuilder\TaxonomyQuery;
-
 /**
  * Class Wizhi_Filter
  */
@@ -16,7 +12,7 @@ class Filter
      *
      * @var array
      */
-    private $post_types;
+    private $post_type;
 
 
     /**
@@ -48,11 +44,11 @@ class Filter
     const BUILD_IN_ORDERBY = ['none', 'ID', 'author', 'title', 'name', 'type', 'date', 'modified', 'parent', 'rand', 'comment_count', 'relevance'];
 
 
-    function __construct($post_types, $taxonomies)
+    function __construct($post_type, $taxonomies)
     {
 
         // 获取参数
-        $this->post_types = $post_types;
+        $this->post_type  = $post_type;
         $this->taxonomies = $taxonomies;
     }
 
@@ -79,7 +75,7 @@ class Filter
      *
      * @return $this
      */
-    function set_taxonomy($tax)
+    function set_taxonomy($tax): Filter
     {
         $this->taxonomies[] = $tax;
 
@@ -90,11 +86,11 @@ class Filter
     /**
      * 设置分页
      *
-     * @param $posts_per_page
+     * @param int $posts_per_page
      *
      * @return $this
      */
-    function set_per_page($posts_per_page = 0)
+    function set_per_page(int $posts_per_page = 0): Filter
     {
         if ($posts_per_page === 0) {
             $posts_per_page = get_option('posts_per_page');
@@ -118,7 +114,7 @@ class Filter
      *
      * @return $this
      */
-    function add_meta($meta_key, $meta_label, $meta_values = [], $compare = '=', $type = 'String')
+    function add_meta($meta_key, $meta_label, array $meta_values = [], string $compare = '=', string $type = 'String'): Filter
     {
         if (count($meta_values) == 0) {
             $meta_values = $this->get_all_meta_values($meta_key);
@@ -145,7 +141,7 @@ class Filter
      *
      * @return $this
      */
-    function add_orders($order, $label, $default = 'DESC')
+    function add_orders(string $order, string $label, string $default = 'DESC'): Filter
     {
         $this->orders[] = [
             'order'   => $order,
@@ -164,7 +160,7 @@ class Filter
      *
      * @return array
      */
-    function get_all_meta_values($meta_key)
+    function get_all_meta_values($meta_key): array
     {
         global $wpdb;
 
@@ -183,7 +179,7 @@ class Filter
     /**
      * 获取分类法过滤链接
      */
-    public function show_filters()
+    public function render_filters()
     {
 
         $taxonomies = $this->taxonomies;
@@ -194,7 +190,7 @@ class Filter
                 'hide_empty' => false,
             ]);
 
-            $term_counts = $this->get_filtered_term_post_counts(wp_list_pluck($terms, 'term_id'), $taxonomy);
+            $term_counts = $this->get_filtered_posts_count(wp_list_pluck($terms, 'term_id'), $taxonomy);
 
             if (array_sum($term_counts) > 0):
 
@@ -227,7 +223,7 @@ class Filter
 
                                 $include_term_var = [$query_var => $term->slug, 'paged' => false,];
 
-                                if ($term_counts[ $term->term_id ] > 0) {
+                                if (isset($term_counts[ $term->term_id ]) && $term_counts[ $term->term_id ] > 0) {
 
                                     echo '<li>';
 
@@ -262,7 +258,7 @@ class Filter
     /**
      * 显示自定义字段过滤链接
      */
-    function show_meta_filter_links()
+    function render_meta_filters()
     {
 
         $metas = $this->metas;
@@ -273,7 +269,7 @@ class Filter
             echo '<strong>' . $meta[ 'meta_label' ] . '</strong>';
 
             $query_var   = $meta[ 'meta_key' ];
-            $query_value = isset($_GET[ $query_var ]) ? $_GET[ $query_var ] : false;
+            $query_value = $_GET[ $query_var ] ?? false;
 
             $is_all = $query_value ? '' : 'selected';
 
@@ -315,12 +311,12 @@ class Filter
      *
      * @return array
      */
-    public function get_filtered_term_post_counts($term_ids, $taxonomy)
+    private function get_filtered_posts_count($term_ids, $taxonomy)
     {
         global $wpdb;
         global $wp_query;
 
-        $post_type = $this->post_types;
+        $post_type = $this->post_type;
 
         $tax_query  = $wp_query->tax_query->queries;
         $meta_query = $wp_query->meta_query->queries;
@@ -342,7 +338,7 @@ class Filter
 			" . $tax_query_sql[ 'join' ] . $meta_query_sql[ 'join' ];
 
         $query[ 'where' ] = "
-			WHERE {$wpdb->posts}.post_type IN ( 'school' )
+			WHERE {$wpdb->posts}.post_type IN ( '$post_type' )
 			AND {$wpdb->posts}.post_status = 'publish'"
                             . $tax_query_sql[ 'where' ] . $meta_query_sql[ 'where' ] .
                             'AND terms.term_id IN (' . implode(',', array_map('absint', $term_ids)) . ')';
@@ -354,6 +350,7 @@ class Filter
         $query[ 'group_by' ] = 'GROUP BY terms.term_id';
         $query               = apply_filters('woocommerce_get_filtered_term_product_counts_query', $query);
         $query               = implode(' ', $query);
+
 
         // We have a query - let's see if cached results of this query already exist.
         $query_hash = md5($query);
@@ -370,7 +367,7 @@ class Filter
      * 显示当前选择的过滤项目
      *
      */
-    public function current_filter()
+    public function render_current_filter()
     {
 
         $taxonomies      = $this->taxonomies;
@@ -393,8 +390,8 @@ class Filter
                 $term = get_term_by('slug', $query_value, $taxonomy); ?>
 
                 <div class="wizhi-btn-group">
-                    <a href="#" class="wizhi-btn wizhi-btn-default"><?php echo $term->name; ?></a>
-                    <a href="<?php echo remove_query_arg($query_var); ?>" class="wizhi-btn wizhi-btn-close">X</a>
+                    <a href="#" class="wizhi-btn wizhi-btn-default"><?= $term->name; ?></a>
+                    <a href="<?= remove_query_arg($query_var); ?>" class="wizhi-btn wizhi-btn-close">X</a>
                 </div>
 
             <?php
@@ -411,14 +408,14 @@ class Filter
 
             // 获取查询变量值
             $query_var = $meta[ 'meta_key' ];;
-            $query_value = isset($_GET[ $query_var ]) ? $_GET[ $query_var ] : false;
+            $query_value = $_GET[ $query_var ] ?? false;
 
             // 如果获取的查询变量值非空
             if ( ! empty($query_value)) : ?>
 
                 <div class="wizhi-btn-group">
                     <a href="#" class="wizhi-btn wizhi-btn-default"><?= $query_value; ?></a>
-                    <a href="<?php echo remove_query_arg($query_var); ?>" class="wizhi-btn wizhi-btn-close">X</a>
+                    <a href="<?= remove_query_arg($query_var); ?>" class="wizhi-btn wizhi-btn-close">X</a>
                 </div>
 
             <?php
@@ -435,18 +432,19 @@ class Filter
      * 显示按条件搜索的选项
      *
      */
-    public function search_form()
+    public function render_search_form()
     {
 
         global $wp;
 
-        $q           = isset($_POST[ 'q' ]) ? $_POST[ 'q' ] : false;
+        $q           = $_GET[ 'q' ] ?? false;
         $current_url = home_url(add_query_arg([], $wp->request));
-
         ?>
 
-        <form class="wizhi-form" role="search" method="post" id="searchform" action="<?php echo $current_url; ?>">
-            <input type="text" name="q" class="wizhi-search" placeholder="" value="<?php echo $q; ?>">
+        <form class="wizhi-form" role="search" method="get" id="wizhi-search-form" action="<?= $current_url; ?>">
+            <label>
+                <input type="text" name="q" class="wizhi-search" placeholder="" value="<?= $q; ?>">
+            </label>
             <input type="hidden" name="paged" value="1">
             <button type="submit" class="wizhi-btn wizhi-btn-primary">搜索</button>
         </form>
@@ -459,9 +457,9 @@ class Filter
     /**
      * 显示排序条件
      */
-    public function show_sort_links()
+    public function render_sort_links()
     {
-        $dir   = isset($_GET[ 'dir' ]) ? $_GET[ 'dir' ] : 'DESC';
+        $dir   = $_GET[ 'dir' ] ?? 'DESC';
         $dir   = ($dir == 'DESC') ? 'ASC' : 'DESC';
         $sorts = $this->orders;
         ?>
@@ -472,7 +470,7 @@ class Filter
 
                 <?php
                 $sort_query_var   = $sort[ 'order' ];
-                $sort_query_value = isset($_GET[ $sort_query_var ]) ? $_GET[ $sort_query_var ] : false;
+                $sort_query_value = $_GET[ $sort_query_var ] ?? false;
                 ?>
 
                 <?php if ($sort_query_value) : ?>
@@ -501,9 +499,9 @@ class Filter
      *
      * @return int
      */
-    public function total()
+    public function get_total(): int
     {
-        $query = $this->get_filtered_object();
+        $query = $this->get_queried_object();
 
         return $query->found_posts;
     }
@@ -514,19 +512,19 @@ class Filter
      *
      * @return \WP_Query
      */
-    public function get_filtered_object()
+    public function get_queried_object(): \WP_Query
     {
 
-        $post_types = $this->post_types[ 0 ];
+        $post_type  = $this->post_type;
         $taxonomies = $this->taxonomies;
         $metas      = $this->metas;
 
         /**
          * 获取查询变量
          */
-        $q              = isset($_POST[ 'q' ]) ? $_POST[ 'q' ] : false;
-        $dir            = isset($_GET[ 'dir' ]) ? $_GET[ 'dir' ] : 'DESC';
-        $order_by       = isset($_GET[ 'order_by' ]) ? $_GET[ 'order_by' ] : false;
+        $q              = $_GET[ 'q' ] ?? false;
+        $dir            = $_GET[ 'dir' ] ?? 'DESC';
+        $order_by       = $_GET[ 'order_by' ] ?? false;
         $paged          = (get_query_var('paged')) ? get_query_var('paged') : 1;
         $posts_per_page = $this->posts_per_page;
 
@@ -552,13 +550,14 @@ class Filter
                 ];
 
                 // 添加新的分类法查询到查询数组
-                array_push($tax_query_array, $tax_query);
+                $tax_query_array[] = $tax_query;
 
             endif;
 
         endforeach;
 
         $tax_query = [];
+
         if (count($tax_query_array) > 1) {
             $tax_query = [
                 'tax_query' => $tax_query_array,
@@ -575,7 +574,7 @@ class Filter
 
             // 获取查询变量值
             $query_var   = $meta[ 'meta_key' ];
-            $query_value = isset($_GET[ $query_var ]) ? $_GET[ $query_var ] : false;
+            $query_value = $_GET[ $query_var ] ?? false;
             $type        = $meta[ 'type' ];
             $compare     = $meta[ 'compare' ];
 
@@ -590,7 +589,7 @@ class Filter
                 ];
 
                 // 添加新的分类法查询到查询数组
-                array_push($meta_query_array, $meta_query);
+                $meta_query_array[] = $meta_query;
 
             endif;
 
@@ -607,7 +606,6 @@ class Filter
         /**
          * 排序参数
          */
-
         if (in_array($order_by, static::BUILD_IN_ORDERBY)) {
             $order_args = [
                 'orderby' => $order_by,
@@ -636,117 +634,14 @@ class Filter
          * 默认查询数组
          */
         $default_args = [
-            'post_type'      => $post_types,
+            'post_type'      => $post_type,
             'posts_per_page' => $posts_per_page,
             'paged'          => $paged,
         ];
 
         $args = array_merge($default_args, $tax_query, $meta_query, $order_args, $search_args);
 
-        $wp_query = new \WP_Query($args);
-
-        return $wp_query;
-
-    }
-
-
-    /**
-     * 新查询
-     *
-     * @return \WP_Query
-     * @throws \Simettric\WPQueryBuilder\Exception\MainMetaQueryAlreadyCreatedException
-     *
-     */
-    function get_query()
-    {
-
-        $builder = new Builder();
-
-        $post_types = $this->post_types[ 0 ];
-        $taxonomies = $this->taxonomies;
-        $metas      = $this->metas;
-
-
-        /**
-         * 获取查询变量
-         */
-        $q              = isset($_POST[ 'q' ]) ? $_POST[ 'q' ] : false;
-        $dir            = isset($_GET[ 'dir' ]) ? $_GET[ 'dir' ] : 'DESC';
-        $order_by       = isset($_GET[ 'order_by' ]) ? $_GET[ 'order_by' ] : false;
-        $paged          = (get_query_var('paged')) ? get_query_var('paged') : 1;
-        $posts_per_page = $this->posts_per_page;
-
-
-        // 文章类型
-        $wp_query = $builder->addPostType($post_types);
-
-        // 搜索
-        $wp_query = $wp_query->search($q);
-
-
-        // 分类方法
-
-        try {
-            $wp_query = $wp_query->createMainTaxonomyQuery("AND");
-        } catch (\Exception $e) {
-            echo $e->getMessage();
-        }
-
-        foreach ($taxonomies as $taxonomy) :
-
-            // 获取查询变量值
-            $query_var   = $taxonomy;
-            $query_value = get_query_var($query_var);
-
-            // 如果获取的查询变量值非空
-            if ( ! empty($query_value)) :
-                $wp_query->addTaxonomyQuery(TaxonomyQuery::create($taxonomy, 'slug', $query_value, true, "="));
-            endif;
-
-        endforeach;
-
-
-        // 自定义字段
-        $wp_query = $builder->createMainMetaQuery("AND");
-
-        foreach ($metas as $meta) :
-
-            // 获取查询变量值
-            $query_var   = $meta[ 'meta_key' ];
-            $query_value = isset($_GET[ $query_var ]) ? $_GET[ $query_var ] : false;
-            $type        = $meta[ 'type' ];
-            $compare     = $meta[ 'compare' ];
-
-            // 如果获取的查询变量值非空
-            if ($query_value) :
-                $wp_query->addMetaQuery(MetaQuery::create($query_var, $query_value, $compare, $type));
-            endif;
-
-        endforeach;
-
-
-        // 排序
-        if (in_array($order_by, static::BUILD_IN_ORDERBY)) {
-            $wp_query->setOrderBy($order_by)
-                     ->setOrderDirection($dir);
-        } else {
-            // 按自定义字段排序
-            try {
-                $wp_query->setOrderByMeta($order_by, $dir, true);
-            } catch (\Exception $e) {
-                echo $e->getMessage();
-            }
-        }
-
-        // 设置分页
-        $wp_query->setLimit($posts_per_page)
-                 ->setOffset($posts_per_page * $paged);
-
-
-        // 获取 WP_Query 查询
-        $wp_query = $wp_query->getWPQuery();
-
-        return $wp_query;
+        return new \WP_Query($args);
 
     }
 
