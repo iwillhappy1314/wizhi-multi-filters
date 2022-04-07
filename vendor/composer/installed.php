@@ -1,0 +1,41 @@
+<?php return array(
+    'root' => array(
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
+        'type' => 'library',
+        'install_path' => __DIR__ . '/../../',
+        'aliases' => array(),
+        'reference' => '7f83f155a5fba13c996bb3a585b60f227a9faade',
+        'name' => 'wizhi/multi-filters',
+        'dev' => true,
+    ),
+    'versions' => array(
+        'doctrine/inflector' => array(
+            'pretty_version' => '1.1.x-dev',
+            'version' => '1.1.9999999.9999999-dev',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../doctrine/inflector',
+            'aliases' => array(),
+            'reference' => '90b2128806bfde671b6952ab8bea493942c1fdae',
+            'dev_requirement' => false,
+        ),
+        'wenprise/content-types' => array(
+            'pretty_version' => '1.0.10',
+            'version' => '1.0.10.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../wenprise/content-types',
+            'aliases' => array(),
+            'reference' => 'a4de6813e399343f9647d6158d1d5069d14ebd0f',
+            'dev_requirement' => false,
+        ),
+        'wizhi/multi-filters' => array(
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../../',
+            'aliases' => array(),
+            'reference' => '7f83f155a5fba13c996bb3a585b60f227a9faade',
+            'dev_requirement' => false,
+        ),
+    ),
+);
