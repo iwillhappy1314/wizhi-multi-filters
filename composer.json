@@ -11,6 +11,8 @@
       "Wizhi\\": "src/"
     },
     "files": [
+      "src/options.php",
+      "src/setup.php",
       "src/helper.php"
     ]
   },

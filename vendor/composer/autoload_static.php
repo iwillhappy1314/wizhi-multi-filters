@@ -10,6 +10,8 @@ class ComposerStaticInit59057821eb04469a56bff79213e671a8
         'e54100d542398f1a2b8406721188abb2' => __DIR__ . '/..' . '/wenprise/content-types/src/content-type.php',
         'e13df2aca5088cd061b400a5e11cf139' => __DIR__ . '/..' . '/wenprise/content-types/src/taxonomy.php',
         '9968b45337becf13658c08a16ab4407d' => __DIR__ . '/..' . '/wenprise/content-types/src/helper.php',
+        '5f68967dec9b66ef266f149d4d365efc' => __DIR__ . '/../..' . '/src/options.php',
+        'b614f1053c0b03b8299c96dcaa11eb3d' => __DIR__ . '/../..' . '/src/setup.php',
         '92ebd1ddb5d12f9f2e816f2d00e3d17e' => __DIR__ . '/../..' . '/src/helper.php',
     );
 
@@ -35,11 +37,27 @@ class ComposerStaticInit59057821eb04469a56bff79213e671a8
         ),
     );
 
+    public static $prefixesPsr0 = array (
+        'D' => 
+        array (
+            'Doctrine\\Common\\Inflector\\' => 
+            array (
+                0 => __DIR__ . '/..' . '/doctrine/inflector/lib',
+            ),
+        ),
+    );
+
+    public static $classMap = array (
+        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+    );
+
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit59057821eb04469a56bff79213e671a8::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit59057821eb04469a56bff79213e671a8::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit59057821eb04469a56bff79213e671a8::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit59057821eb04469a56bff79213e671a8::$classMap;
 
         }, null, ClassLoader::class);
     }
